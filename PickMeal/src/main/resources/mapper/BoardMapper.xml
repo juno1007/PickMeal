@@ -77,6 +77,18 @@
         UPDATE board SET dislikeCount = dislikeCount + 1 WHERE boardId = #{boardId}
     </update>
 
+    <update id="removeLikeCount" parameterType="long">
+        UPDATE board
+        SET likeCount = likeCount - 1
+        WHERE boardId = #{boardId} AND likeCount > 0
+    </update>
+
+    <update id="removeDislikeCount" parameterType="long">
+        UPDATE board
+        SET dislikeCount = dislikeCount - 1
+        WHERE boardId = #{boardId} AND dislikeCount > 0
+    </update>
+
     <select id="findByUser_id" resultType="PickMeal.PickMeal.domain.Board">
         SELECT
         b.*,

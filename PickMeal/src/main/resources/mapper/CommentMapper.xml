@@ -18,8 +18,8 @@
         ORDER BY c.createCommentDate ASC
     </select>
     <insert id="writeComment" parameterType="PickMeal.PickMeal.domain.Comment">
-            INSERT INTO comment(boardId, user_id, content)
-            VALUES(#{boardId}, #{user_id}, #{content})
+        INSERT INTO comment(boardId, user_id, content, createCommentDate)
+        VALUES(#{boardId}, #{user_id}, #{content}, NOW())
     </insert>
     <delete id="deleteComment" parameterType="long">
             DELETE FROM comment

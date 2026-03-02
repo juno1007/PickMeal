@@ -111,6 +111,7 @@ public class BoardController {
 
     @GetMapping("/detail/{boardId}")
     public String showBoardDetail(@PathVariable Long boardId, Authentication authentication, Model model) {
+        boardService.updateViewCount(boardId);
         Board board = boardService.getBoardByBoardId(boardId);
         User loginUser = userService.getAuthenticatedUser(authentication);
 
