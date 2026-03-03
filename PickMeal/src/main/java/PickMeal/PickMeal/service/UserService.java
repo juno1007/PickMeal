@@ -61,9 +61,11 @@ public class UserService implements UserDetailsService {
         userMapper.save(user); // DB 저장
     }
 
-    // 아이디 중복체크
     public boolean isIdDuplicate(String id) {
-        return userMapper.findById(id) != null; // 존재 여부 반환
+        // 1. 유저 테이블에서 아이디 존재 여부 확인
+        boolean existsInUser = userMapper.findById(id) != null;
+
+        return existsInUser;
     }
 
     /**
@@ -86,12 +88,17 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
-        User user = userMapper.findById(id); // 시큐리티 로그인 시 아이디로 조회
-        if (user == null) {
-            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + id);
-        }
-        return user; // UserDetails 구현체인 User 반환
+    public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
+        User user = userMapper.findById(loginId);
+        if (user == null) throw new UsernameNotFoundException("사용자 없음");
+
+        String roleName = user.getRole().replace("ROLE_", "");
+
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getId())
+                .password(user.getPassword())
+                .roles(roleName)
+                .build();
     }
 
     private void validateDuplicateUser(String id) {
@@ -172,10 +179,9 @@ public class UserService implements UserDetailsService {
         userMapper.updateWinCount(foodId);
     }
 
-    public String findByUser_id(Long user_id) {
+    public User findByUser_id(Long user_id) {
         return userMapper.findByUser_id(user_id);
     }
-
     /**
      * 이메일 즉시 변경
      */
@@ -226,25 +232,14 @@ public class UserService implements UserDetailsService {
     }
 
     public User getAuthenticatedUser(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return null;
-        }
+        if (authentication == null || !authentication.isAuthenticated()) return null;
 
-        // 1. 기본 식별값(ID) 가져오기
+        // 테이블이 하나이므로 principalName(ID)으로 바로 findById 호출
         String principalName = authentication.getName();
 
-        // 2. 소셜 로그인인 경우 registrationId(kakao, naver 등) 추출
-        String registrationId = "";
-        if (authentication instanceof OAuth2AuthenticationToken token) {
-            registrationId = token.getAuthorizedClientRegistrationId();
-        }
-
-        // 3. DB 저장 형식에 맞게 ID 재조합 (일반: id, 소셜: kakao_id)
-        String fullUserId = registrationId.isEmpty() ? principalName : registrationId + "_" + principalName;
-
-        // 4. 재조합된 ID로 DB에서 유저 조회
-        return findById(fullUserId);
+        // 소셜 로그인 ID 조합 로직이 있다면 그대로 유지하되,
+        // 일반/관리자 로그인은 그냥 principalName이 ID가 됩니다.
+        return findById(principalName);
     }
-
 
 }

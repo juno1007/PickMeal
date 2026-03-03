@@ -20,6 +20,7 @@ public class SecurityConfig {
 
     private final AuthenticationFailureHandler loginFailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
+    private final LoginSuccessHandler loginSuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -30,24 +31,25 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, OAuth2SuccessHandler oauth2SuccessHandler) throws Exception {
         http
                 .csrf(csrf -> csrf.ignoringRequestMatchers(
-                        "/mail/**", "/users/**", "/worldcup/win/**", "/hotplace/**",
+                        "/mail/**", "/users/**", "/worldcup/win/**", "/hotplace/**", "/board/remove/**",
                         "/board/write", "/file/upload", "/api/wishlist/**", "/api/restaurant/**", "/api/review/**"
                 ))
                 .authorizeHttpRequests(authorize -> authorize
-                        // 1. [구체적인 예외] 게시판 중 'meal-spotter'는 로그인 없이도 볼 수 있게 최상단에 둡니다.
-                        .requestMatchers("/board/meal-spotter").permitAll()
+                        // 1. 구체적인 인증 필요 경로
+                        .requestMatchers("/board/write/**", "/board/remove/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/users/mypage", "/users/edit","/board/edit/**" ).authenticated()
 
-                        // 2. [로그인 필수] 글쓰기, 수정, 삭제 등은 로그인이 필요합니다.
-                        .requestMatchers("/users/mypage", "/users/edit", "/board/write", "/board/edit/**", "/board/remove/**").authenticated()
+                        // 2. 게시판 목록 및 상세는 누구나 접근 가능 (순서 중요!)
+                        .requestMatchers("/board/list", "/board/detail/**", "/board/meal-spotter").permitAll()
 
-                        // 3. [공통 허용] 나머지 모든 정적 리소스와 게임, API 경로들을 허용합니다.
-                        .requestMatchers("/", "/next-page", "/hotplace", "/board/**", // 상세보기도 로그인 없이 가능하게 하려면 여기에 포함
+                        // 3. 나머지 공통 허용
+                        .requestMatchers("/", "/next-page", "/hotplace",
                                 "/users/signup", "/users/signup/social", "/users/login",
                                 "/users/check-id", "/users/check-nickname", "/users/find-id",
                                 "/users/forgot-pw", "/users/find-password/**", "/users/reset-password/**",
-                                "/mail/**", "/oauth2/**", "/css/**", "/js/**", "/images/**", "/Korea_city_List.json", "/Food_List.json","/worldcup/win/**",
+                                "/mail/**", "/oauth2/**", "/css/**", "/js/**", "/images/**", "/*.json",
                                 "/roulette", "/twentyQuestions/**", "/twenty-questions/**", "/capsule", "/game/**", "/worldcup/**",
-                                "/api/**", "/draw", "/meal-spotter", "/hotplace/**", "/*.json").permitAll()
+                                "/api/**", "/draw", "/meal-spotter", "/hotplace/**").permitAll()
 
                         .anyRequest().authenticated()
                 )
@@ -55,7 +57,7 @@ public class SecurityConfig {
                         .loginPage("/users/login")
                         .loginProcessingUrl("/users/login")
                         .usernameParameter("id")
-                        .defaultSuccessUrl("/next-page", true)
+                        .successHandler(loginSuccessHandler)
                         .failureHandler(loginFailureHandler)
                 )
                 .oauth2Login(oauth2 -> oauth2

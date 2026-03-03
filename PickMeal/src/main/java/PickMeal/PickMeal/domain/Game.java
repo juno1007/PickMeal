@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 public class Game {
     private Long gameId;
     private Long user_id;
-    private Long admin_id;
     private Long food_id;
     private String gameType;
     private LocalDateTime playDate;

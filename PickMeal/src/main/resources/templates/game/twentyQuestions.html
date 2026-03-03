@@ -5,13 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="_csrf" th:content="${_csrf?.token}" th:if="${_csrf}"/>
     <meta name="_csrf_header" th:content="${_csrf?.headerName}" th:if="${_csrf}"/>
-
     <title>Pick Meal - 스무고개 게임</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
-
     <style>
+        /* 기존 스타일 동일 */
         body { font-family: 'Fredoka', sans-serif; background-color: #FFF5F0; display: flex; flex-direction: column; min-height: 100vh; margin: 0; overflow-x: hidden; }
         [data-custom-header] a, [data-custom-header] button, [data-custom-header] span, .custom-italic { font-family: 'Fredoka', sans-serif !important; font-weight: 800 !important; font-style: italic !important; display: inline-block !important; }
         main { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; padding: 100px 20px 40px; }
@@ -58,16 +57,23 @@
     </div>
 </main>
 
-<footer th:replace="~{fragments/footer :: footerFragment}"></footer >
+<footer th:replace="~{fragments/footer :: footerFragment}"></footer>
 
 <script th:inline="javascript">
+    // [보정] DTO와 이름이 같은 카멜케이스 객체
     let currentState = {
-        category_korean: null, category_western: null, category_chinese: null, category_japanese: null, category_asian: null,
-        isSpicy: null, isSoup: null, isFried: null, isRoasted: null, hasPork: null, hasBeef: null, askedQuestionIds: []
+        categoryKorean: null, categoryWestern: null, categoryChinese: null,
+        categoryJapanese: null, categoryAsian: null,
+        isSpicy: null, isSoup: null, isFried: null, isRoasted: null,
+        hasPork: null, hasBeef: null, askedQuestionIds: []
     };
 
-    let currentAttribute = ""; let currentQuestionStep = 0; const maxSteps = 20;
-    let remainingFoods = []; let finalTemplate = ""; let currentSuggestingFood = "";
+    let currentAttribute = "";
+    let currentQuestionStep = 0;
+    const maxSteps = 20;
+    let remainingFoods = [];
+    let finalTemplate = "";
+    let currentSuggestingFood = "";
 
     window.onload = () => { fetchNextStep(); };
 
@@ -79,13 +85,15 @@
 
         try {
             const response = await fetch('/twenty-questions/next', {
-                method: 'POST', headers: headers,
+                method: 'POST',
+                headers: headers,
                 body: JSON.stringify(currentState)
             });
             const data = await response.json();
 
             if (data.status === "QUESTION") {
                 document.getElementById('question-text').innerText = data.nextQuestion_text;
+                // [주의] DB 컬럼명인 'category_korean' 등이 들어옴
                 currentAttribute = data.nextAttribute_name;
                 currentState.askedQuestionIds.push(parseInt(data.nextQuestion_id));
                 currentQuestionStep++;
@@ -100,81 +108,85 @@
             }
         } catch (error) {
             console.error("서버 통신 에러:", error);
-            document.getElementById('question-text').innerText = "서버와 연결할 수 없습니다 😭";
         }
     }
 
     function askFinalFood() {
-        if (remainingFoods.length > 0) {
-            currentSuggestingFood = remainingFoods.shift();
-            document.getElementById('question-text').innerText = currentSuggestingFood + finalTemplate;
-            currentQuestionStep++;
-            updateProgressBar();
-        } else {
-            alert("추천해 드린 음식이 다 마음에 안 드시나요? 😭 다시 찾아볼까요?");
-            location.reload();
-        }
+    if (remainingFoods.length > 0) {
+        currentSuggestingFood = remainingFoods.shift();
+        // finalTemplate이 null이면 기본값 처리
+        const template = finalTemplate || "는 어떠신가요? 🤔";
+        document.getElementById('question-text').innerText = currentSuggestingFood + template;
+        currentQuestionStep++;
+        updateProgressBar();
+    } else {
+        alert("추천해 드린 음식이 다 마음에 안 드시나요? 😭 다시 찾아볼까요?");
+        location.reload();
     }
+}
 
     async function nextQuestion(isYes) {
-    if (currentSuggestingFood !== "") {
-        if (isYes) {
-    try {
-        // 1. 사진 경로 가져오기 (기존 기능)
-        const imgRes = await fetch(`/twenty-questions/api/food/imagePath?foodName=${encodeURIComponent(currentSuggestingFood)}`);
-        const realImagePath = await imgRes.text();
-
-        // 2. [랭킹 반영] 이름으로 ID 찾아서 승리 카운트 업데이트
-        const idRes = await fetch(`/api/food/getIdByName?foodName=${encodeURIComponent(currentSuggestingFood)}`);
-        const foodId = await idRes.json();
-
-        if (foodId) {
-            // 학생님이 찾으신 월드컵용 승리 업데이트 API 호출!
-            fetch('/worldcup/win/' + foodId + '?gameType=twenty', { method: 'POST' })
-    .catch(e => {});
-        }
-
-                // 3. 결과 화면 렌더링 (사진 출력)
-                const main = document.getElementById('game-main');
-                main.className = "flex flex-col items-center justify-center w-full min-h-[70vh] px-10";
-                main.innerHTML = `
-                    <div class="flex flex-col items-center justify-center w-full animate-bounce mb-2">
-                        <h2 class="text-[#FF8A5B] font-black text-5xl uppercase italic tracking-tighter">WINNER</h2>
-                    </div>
-                    <div class="bg-white winner-card-mid shadow-2xl border-4 border-[#FF8A5B] w-full text-center">
-                        <div class="winner-img-mid mb-6 shadow-md bg-gray-50">
-                            <img src="${realImagePath}" class="w-full h-full object-cover" onerror="this.src='/images/meal.png'">
-                        </div>
-                        <h1 class="text-4xl font-black text-gray-800 italic mb-6 uppercase tracking-tighter">${currentSuggestingFood}</h1>
-                        <div class="grid grid-cols-2 gap-3 mb-4">
-                            <button onclick="location.href='/game'" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm hover:bg-gray-200 transition">HOME 🏠</button>
-                            <button onclick="location.reload()" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm hover:bg-gray-200 transition">RESTART 🔄</button>
-                            <button onclick="location.href='/worldcup/ranking'" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm hover:bg-gray-200 transition">RANK 🏆</button>
-                            <button onclick="copyToClipboard('${currentSuggestingFood}')" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm hover:bg-gray-200 transition">SHARE 🔗</button>
-                        </div>
-                        <button onclick="window.open('https://map.kakao.com/link/search/' + encodeURIComponent('${currentSuggestingFood}'))"
-                                class="w-full py-4 bg-[#FAE100] rounded-full font-black text-lg shadow-md hover:bg-[#ebd300] transition italic">
-                            주변 맛집 찾기 📍
-                        </button>
-                    </div>
-                `;
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, zIndex: 9999 });
-
-            } catch(error) {
-                console.error("결과 처리 중 에러:", error);
-                alert("결과 화면을 불러오는 중 오류가 발생했습니다.");
+        if (currentSuggestingFood !== "") {
+            if (isYes) {
+                try {
+                    const imgRes = await fetch(`/twenty-questions/api/food/imagePath?foodName=${encodeURIComponent(currentSuggestingFood)}`);
+                    const realImagePath = await imgRes.text();
+                    const idRes = await fetch(`/api/food/getIdByName?foodName=${encodeURIComponent(currentSuggestingFood)}`);
+                    const foodId = await idRes.json();
+                    if (foodId) {
+                        fetch('/worldcup/win/' + foodId + '?gameType=twenty', { method: 'POST' }).catch(e => {});
+                    }
+                    renderWinner(realImagePath, currentSuggestingFood);
+                } catch(error) {
+                    console.error("결과 처리 중 에러:", error);
+                }
+            } else {
+                askFinalFood();
             }
-        } else {
-            askFinalFood();
+            return;
         }
-        return;
+
+        if (currentAttribute) {
+            // [핵심 해결사] snake_case(category_korean)를 camelCase(categoryKorean)로 변환
+            const camelKey = currentAttribute.replace(/_([a-z])/g, (match, letter) => letter.toUpperCase());
+
+            // 변환된 키가 currentState에 있으면 값을 업데이트
+            if (currentState.hasOwnProperty(camelKey)) {
+                currentState[camelKey] = isYes ? 1 : 0;
+            } else {
+                // 변환 실패 시 대비용
+                currentState[currentAttribute] = isYes ? 1 : 0;
+            }
+        }
+        fetchNextStep();
     }
 
-    if (currentAttribute) {
-        currentState[currentAttribute] = isYes ? 1 : 0;
+    function renderWinner(imagePath, foodName) {
+        const main = document.getElementById('game-main');
+        main.className = "flex flex-col items-center justify-center w-full min-h-[70vh] px-10";
+        main.innerHTML = `
+            <div class="flex flex-col items-center justify-center w-full animate-bounce mb-2">
+                <h2 class="text-[#FF8A5B] font-black text-5xl uppercase italic tracking-tighter">WINNER</h2>
+            </div>
+            <div class="bg-white winner-card-mid shadow-2xl border-4 border-[#FF8A5B] w-full text-center">
+                <div class="winner-img-mid mb-6 shadow-md bg-gray-50">
+                    <img src="${imagePath}" class="w-full h-full object-cover" onerror="this.src='/images/meal.png'">
+                </div>
+                <h1 class="text-4xl font-black text-gray-800 italic mb-6 uppercase tracking-tighter">${foodName}</h1>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button onclick="location.href='/game'" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm">HOME 🏠</button>
+                    <button onclick="location.reload()" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm">RESTART 🔄</button>
+                    <button onclick="location.href='/worldcup/ranking'" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm">RANK 🏆</button>
+                    <button onclick="copyToClipboard('${foodName}')" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm">SHARE 🔗</button>
+                </div>
+                <button onclick="window.open('https://map.kakao.com/link/search/' + encodeURIComponent('${foodName}'))"
+                        class="w-full py-4 bg-[#FAE100] rounded-full font-black text-lg shadow-md italic">
+                    주변 맛집 찾기 📍
+                </button>
+            </div>
+        `;
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, zIndex: 9999 });
     }
-    fetchNextStep();
-}
 
     function updateProgressBar() {
         const track = document.getElementById('progress-track');

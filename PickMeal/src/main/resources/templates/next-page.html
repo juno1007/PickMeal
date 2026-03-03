@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="icon" type="image/png" th:href="@{/images/pickmeal_favicon2.png}">
+
     <style>
         /* 1. body를 flex 구조로 만들고 최소 높이를 화면 전체(100vh)로 설정 */
         body {
@@ -43,8 +45,8 @@
             <div class="swiper-wrapper" id="menuWrapper">
                 <div class="swiper-slide p-2" th:each="rest : ${popularRestList}">
 
-                    <div class="food-card bg-white overflow-hidden shadow-lg border-2 border-gray-50 p-6"
-                         th:onclick="|location.href='@{/restaurant/detail/{id}(res_id=${rest.res_id})}'|">
+                    <div class="food-card bg-white overflow-hidden shadow-lg border-2 border-gray-50 p-6">
+                        <!-- th:onclick="|location.href='@{/restaurant/detail/{restId}(restId=${rest.restId})}'|" -->
 
                         <div class="bg-[#FFF5F0] h-56 rounded-[2.5rem] mb-5 flex flex-col items-center justify-center select-none transition hover:bg-[#FF8A5B] hover:text-white group">
                             <div class="text-5xl mb-2 group-hover:scale-125 transition">❤️</div>
@@ -54,13 +56,13 @@
 
                         <div class="px-4 text-center">
                             <h3 class="text-2xl font-black text-gray-800 italic uppercase truncate"
-                                th:text="${rest.representative_menu}">대표 메뉴</h3>
+                                th:text="${rest.restMenu}">대표 메뉴</h3>
 
-                            <p class="text-gray-500 mt-2 font-bold" th:text="${rest.res_name}">식당 이름</p>
+                            <p class="text-gray-500 mt-2 font-bold" th:text="${rest.restName}">식당 이름</p>
 
                             <div class="flex justify-between items-center mt-6">
                                 <span class="text-[#FF8A5B] text-xl font-black"
-                                      th:text="${#numbers.formatInteger(rest.menu_price, 0, 'COMMA')} + ' 원'">15,000 원</span>
+                                      th:text="${#numbers.formatInteger(rest.restPrice, 0, 'COMMA')} + ' 원'">15,000 원</span>
                                 <button class="bg-[#A8D5BA] text-white px-5 py-2 rounded-full font-black shadow-md hover:bg-[#8fc7a5] transition text-sm">보러가기</button>
                             </div>
                         </div>
@@ -72,38 +74,90 @@
         <div class="swiper-button-prev"></div>
     </div>
 </div>
+<div class="flex-grow px-10 pb-20 pt-10">
+    <div class="flex justify-between items-end mb-12">
+        <div>
+            <h2 class="text-5xl font-black text-[#FFB74D] italic uppercase tracking-tighter mb-4">Real Hot Place</h2>
+            <p class="text-[#FFB74D] mt-3 font-bold italic">Users' Most Loved Spots!</p>
+        </div>
+    </div>
+
+    <div class="swiper-container-wrapper">
+        <div class="swiper mySwiper2">
+            <div class="swiper-wrapper" id="hotPlaceMenuWrapper">
+
+                <div class="swiper-slide p-2" th:each="kakao : ${popularPlaceList}">
+
+                    <div class="food-card bg-white overflow-hidden shadow-lg border-2 border-gray-50 p-6"
+                         th:data-url="'https://place.map.kakao.com/' + ${kakao.kakaoPlaceId}"
+                         onclick="window.open(this.getAttribute('data-url'))">
+
+                        <div class="bg-[#FFF8E1] h-56 rounded-[2.5rem] mb-5 flex flex-col items-center justify-center select-none transition hover:bg-[#FFB74D] hover:text-white group">
+                            <div class="text-5xl mb-2 group-hover:scale-125 transition">🔥</div>
+                            <div class="text-[#FFB74D] text-2xl font-black group-hover:text-white"
+                                 th:text="${kakao.heartCount} + ' 하트!'">5 하트!</div>
+                        </div>
+
+                        <div class="px-4 text-center">
+                            <h3 class="text-2xl font-black text-gray-800 italic uppercase truncate"
+                                th:text="${kakao.placeName != null ? kakao.placeName : '이름 없는 맛집'}">카카오 맛집</h3>
+
+                            <p class="text-gray-500 mt-2 font-bold" th:text="'조회수: ' + ${kakao.viewCount}">조회수: 10</p>
+
+                            <div class="flex justify-between items-center mt-6">
+                                <span class="text-gray-600 text-sm font-black" th:text="'리뷰 ' + ${kakao.reviewCount} + '개'">리뷰 3개</span>
+                                <button class="bg-[#FFB74D] text-white px-5 py-2 rounded-full font-black shadow-md hover:bg-[#ffa01c] transition text-sm">카카오맵 보기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="swiper-button-next2 absolute right-0 top-1/2 -translate-y-1/2 z-10 cursor-pointer text-[#FFB74D] font-bold text-2xl p-4">▶</div>
+        <div class="swiper-button-prev2 absolute left-0 top-1/2 -translate-y-1/2 z-10 cursor-pointer text-[#FFB74D] font-bold text-2xl p-4">◀</div>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-    const menuItems = [
-        { name: "Pepperoni Pizza", price: "15,000", emoji: "🍕" },
-        { name: "Cheese Burger", price: "12,000", emoji: "🍔" },
-        { name: "Premium Sushi", price: "18,000", emoji: "🍣" },
-        { name: "Cream Pasta", price: "14,000", emoji: "🍝" },
-        { name: "Beef Steak", price: "35,000", emoji: "🥩" },
-        { name: "Fried Chicken", price: "20,000", emoji: "🍗" }
-    ];
-
-    document.getElementById('menuWrapper').innerHTML = menuItems.map(item => `
-        <div class="swiper-slide p-2">
-            <div class="food-card bg-white overflow-hidden shadow-lg border-2 border-gray-50 p-6">
-                <div class="bg-[#FFF5F0] h-56 rounded-[2.5rem] mb-5 flex items-center justify-center text-7xl select-none">${item.emoji}</div>
-                <div class="px-4 text-center">
-                    <h3 class="text-2xl font-black text-gray-800 italic uppercase">${item.name}</h3>
-                    <div class="flex justify-between items-center mt-6">
-                        <span class="text-[#FF8A5B] text-xl font-black">${item.price} KRW</span>
-                        <button class="bg-[#A8D5BA] text-white px-6 py-2 rounded-full font-black shadow-md hover:bg-[#8fc7a5] transition uppercase text-sm">Add</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `).join('');
+    // const menuItems = [
+    //     { name: "Pepperoni Pizza", price: "15,000", emoji: "🍕" },
+    //     { name: "Cheese Burger", price: "12,000", emoji: "🍔" },
+    //     { name: "Premium Sushi", price: "18,000", emoji: "🍣" },
+    //     { name: "Cream Pasta", price: "14,000", emoji: "🍝" },
+    //     { name: "Beef Steak", price: "35,000", emoji: "🥩" },
+    //     { name: "Fried Chicken", price: "20,000", emoji: "🍗" }
+    // ];
+    //
+    // document.getElementById('menuWrapper').innerHTML = menuItems.map(item => `
+    //     <div class="swiper-slide p-2">
+    //         <div class="food-card bg-white overflow-hidden shadow-lg border-2 border-gray-50 p-6">
+    //             <div class="bg-[#FFF5F0] h-56 rounded-[2.5rem] mb-5 flex items-center justify-center text-7xl select-none">${item.emoji}</div>
+    //             <div class="px-4 text-center">
+    //                 <h3 class="text-2xl font-black text-gray-800 italic uppercase">${item.name}</h3>
+    //                 <div class="flex justify-between items-center mt-6">
+    //                     <span class="text-[#FF8A5B] text-xl font-black">${item.price} KRW</span>
+    //                     <button class="bg-[#A8D5BA] text-white px-6 py-2 rounded-full font-black shadow-md hover:bg-[#8fc7a5] transition uppercase text-sm">Add</button>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     </div>
+    // `).join('');
 
     new Swiper(".mySwiper", {
         slidesPerView: 3,
         spaceBetween: 25,
         loop: true,
         navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+        breakpoints: { 320: { slidesPerView: 1 }, 768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }
+    });
+
+    new Swiper(".mySwiper2", {
+        slidesPerView: 3,
+        spaceBetween: 25,
+        loop: true,
+        navigation: { nextEl: ".swiper-button-next2", prevEl: ".swiper-button-prev2" },
         breakpoints: { 320: { slidesPerView: 1 }, 768: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }
     });
 </script>

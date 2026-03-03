@@ -13,7 +13,7 @@ public interface CommentMapper {
 
     void deleteComment(long comment_id);
 
-    Comment getCommentByCommentID(long comment_id);
+    Comment getCommentByComment_id(long comment_id);
 
     void updateComment(long comment_id, String content);
 }

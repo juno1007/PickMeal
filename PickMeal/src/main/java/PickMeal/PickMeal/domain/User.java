@@ -12,7 +12,7 @@ import java.util.Date;
 
 @Data
 public class User implements UserDetails { // 시큐리티 연동을 위해 UserDetails 구현
-    private long user_id; // PK
+    private Long user_id; // PK
     private String id; // 로그인 아이디
     private String password; // 비밀번호
     private String nickname; // 별명

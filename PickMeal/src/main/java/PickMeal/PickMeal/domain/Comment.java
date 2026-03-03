@@ -8,7 +8,7 @@ import java.util.Date;
 public class Comment {
     private long comment_id;
     private long boardId;
-    private long user_id;
+    private Long user_id;
     private String content;
     private Date createCommentDate;
     private Date updateCommentDate;

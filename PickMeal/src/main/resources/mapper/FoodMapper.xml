@@ -3,48 +3,47 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="PickMeal.PickMeal.mapper.FoodMapper">
-    <select id = "getFoodInfo" resultType="PickMeal.PickMeal.domain.Food">
+
+    <resultMap id="FoodResultMap" type="PickMeal.PickMeal.domain.Food">
+        <id property="foodId" column="foodId"/>
+        <result property="foodName" column="foodName"/>
+        <result property="category" column="category"/>
+        <result property="description" column="description"/>
+        <result property="imagePath" column="imagePath"/>
+    </resultMap>
+
+    <select id="getFoodInfo" resultMap="FoodResultMap">
         SELECT foodId, foodName, category, description, imagePath
         FROM food
     </select>
-    <select id = "getFilteredFoods" parameterType="PickMeal.PickMeal.dto.GameRequestDto" resultType="String">
-        SELECT
-        f.foodName
+
+    <select id="getFilteredFoods" parameterType="PickMeal.PickMeal.dto.GameRequestDto" resultType="String">
+        SELECT f.foodName
         FROM food f
         JOIN twenty_attribute t ON f.foodId = t.foodId
-        WHERE 1=1
-
-        <if test="category_korean == 1"> AND f.category = 'Korean food' </if>
-        <if test="category_korean == 0"> AND f.category != 'Korean food' </if>
-
-        <if test="category_western == 1"> AND f.category = 'Western food' </if>
-        <if test="category_western == 0"> AND f.category != 'Western food' </if>
-
-        <if test="category_chinese == 1"> AND f.category = 'Chinese food' </if>
-        <if test="category_chinese == 0"> AND f.category != 'Chinese food' </if>
-
-        <if test="category_japanese == 1"> AND f.category = 'Japanese food' </if>
-        <if test="category_japanese == 0"> AND f.category != 'Japanese food' </if>
-
-        <if test="category_asian == 1"> AND f.category = 'Asian food' </if>
-        <if test="category_asian == 0"> AND f.category != 'Asian food' </if>
-
-        <if test="is_soup != null"> AND t.is_soup = #{is_soup} </if>
-        <if test="is_spicy != null"> AND t.is_spicy = #{is_spicy} </if>
-        <if test="is_fried != null"> AND t.is_fried = #{is_fried} </if>
-        <if test="is_roasted != null"> AND t.is_roasted = #{is_roasted} </if>
-        <if test="has_pork != null"> AND t.has_pork = #{has_pork} </if>
-        <if test="has_beef != null"> AND t.has_beef = #{has_beef} </if>
-    </select>
-    <select id="getRandomFoodByCategory" resultType="PickMeal.PickMeal.domain.Food">
-        SELECT * FROM food
         <where>
-            <if test="category != '전체'">
-                AND category = #{category}
-            </if>
+            <choose>
+                <when test="categoryKorean == 1"> AND f.category = 'Korean food' </when>
+                <when test="categoryWestern == 1"> AND f.category = 'Western food' </when>
+                <when test="categoryChinese == 1"> AND f.category = 'Chinese food' </when>
+                <when test="categoryJapanese == 1"> AND f.category = 'Japanese food' </when>
+                <when test="categoryAsian == 1"> AND f.category = 'Asian food' </when>
+                <otherwise>
+                    <if test="categoryKorean == 0"> AND f.category != 'Korean food' </if>
+                    <if test="categoryWestern == 0"> AND f.category != 'Western food' </if>
+                    <if test="categoryChinese == 0"> AND f.category != 'Chinese food' </if>
+                    <if test="categoryJapanese == 0"> AND f.category != 'Japanese food' </if>
+                    <if test="categoryAsian == 0"> AND f.category != 'Asian food' </if>
+                </otherwise>
+            </choose>
+
+            <if test="isSoup != null"> AND t.is_soup = #{isSoup} </if>
+            <if test="isSpicy != null"> AND t.is_spicy = #{isSpicy} </if>
+            <if test="isFried != null"> AND t.is_fried = #{isFried} </if>
+            <if test="isRoasted != null"> AND t.is_roasted = #{isRoasted} </if>
+            <if test="hasPork != null"> AND t.has_pork = #{hasPork} </if>
+            <if test="hasBeef != null"> AND t.has_beef = #{hasBeef} </if>
         </where>
-        ORDER BY RAND()
-        LIMIT 1
     </select>
 
     <select id="findImagePathByName" resultType="string">
@@ -53,11 +52,21 @@
         WHERE foodName = #{foodName}
     </select>
 
-    <select id="findByName" resultType="PickMeal.PickMeal.domain.Food">
+    <select id="findByName" resultMap="FoodResultMap">
         SELECT foodId, foodName, category, description, imagePath
         FROM food
         WHERE foodName = #{name}
     </select>
 
+    <select id="getRandomFoodByCategory" resultMap="FoodResultMap">
+        SELECT * FROM food
+        <where>
+            <if test="category != null and category != '전체'">
+                AND category = #{category}
+            </if>
+        </where>
+        ORDER BY RAND()
+        LIMIT 1
+    </select>
 
 </mapper>

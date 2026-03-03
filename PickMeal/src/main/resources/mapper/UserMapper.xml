@@ -3,6 +3,24 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="PickMeal.PickMeal.mapper.UserMapper">
+    <resultMap id="UserResultMap" type="PickMeal.PickMeal.domain.User">
+        <id property="user_id" column="user_id" />
+        <result property="id" column="id" />
+        <result property="password" column="password" />
+        <result property="nickname" column="nickname" />
+        <result property="name" column="name" />
+        <result property="email" column="email" />
+        <result property="birthDate" column="birthDate" />
+        <result property="gender" column="gender" />
+        <result property="phoneNumber" column="phoneNumber" />
+        <result property="likeMenu" column="likeMenu" />
+        <result property="disLikeMenu" column="disLikeMenu" />
+        <result property="joinDate" column="joinDate" />
+        <result property="role" column="role" />
+        <result property="status" column="status" />
+        <result property="socialLoginSite" column="socialLoginSite" />
+        <result property="socialId" column="socialId" />
+    </resultMap>
     <insert id="save" parameterType="PickMeal.PickMeal.domain.User">
         INSERT INTO user (
         id, password, nickname, name, email, birthDate, gender,
@@ -15,14 +33,8 @@
         )
     </insert>
 
-    <select id="findById" resultType="PickMeal.PickMeal.domain.User">
-        SELECT
-        user_id AS user_id,  id,
-        nickname,
-        likeMenu,
-        disLikeMenu
-        FROM user
-        WHERE id = #{id}
+    <select id="findById" resultMap="UserResultMap">
+        SELECT * FROM user WHERE id = #{id}
     </select>
 
     <select id="findByEmail" resultType="PickMeal.PickMeal.domain.User">
@@ -78,8 +90,9 @@
         WHERE foodId = #{foodId}
     </update>
 
-    <select id="findByUser_id" resultType="String">
-        SELECT nickname FROM user WHERE user_id = #{user_id}
+    <select id="findByUser_id" resultType="PickMeal.PickMeal.domain.User">
+        SELECT * FROM user
+        WHERE user_id = #{userId}
     </select>
 
     <select id="findUserByNameAndEmail" resultType="PickMeal.PickMeal.domain.User">
@@ -106,12 +119,6 @@
 
     <select id="getDislikedMenuString" resultType="String">
         SELECT disLikeMenu FROM user WHERE user_id = #{userId}
-    </select>
-
-    <select id="getDislikedCategories" resultType="String">
-        SELECT category
-        FROM user_preferences -- 🌟 실제 DB의 선호도 테이블 이름을 적어주세요!
-        WHERE user_id = #{userId} AND pref_type = 'DISLIKE'
     </select>
 
 </mapper>

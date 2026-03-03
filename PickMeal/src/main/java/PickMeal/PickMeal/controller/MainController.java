@@ -8,6 +8,10 @@ import PickMeal.PickMeal.service.GameService;
 import PickMeal.PickMeal.service.ReviewService;
 import PickMeal.PickMeal.service.UserService;
 import PickMeal.PickMeal.service.RestaurantService;
+import lombok.extern.slf4j.Slf4j;
+import PickMeal.PickMeal.dto.PlaceStatsDto;
+import PickMeal.PickMeal.dto.RestaurantDTO;
+import PickMeal.PickMeal.service.*;
 import org.springframework.security.core.Authentication;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ui.Model;
@@ -23,10 +27,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class MainController {
     private final ReviewService reviewService;
+    private final PlaceStatsService placeStatsService;
 
     @Autowired
     private UserService userService;
@@ -47,8 +53,14 @@ public class MainController {
 
     @GetMapping("/next-page") //
     public String next(Model model) {
-//        List<RestaurantDTO> popularRestList = reviewWishService.getPopularRest();
-//        model.addAttribute("popularRestList", popularRestList);
+        List<RestaurantDTO> popularRestList = reviewService.getPopularRest();
+        model.addAttribute("popularRestList", popularRestList);
+        System.out.println(popularRestList);
+
+
+        List<PlaceStatsDto> popularPlaceList = placeStatsService.getPopularPlace();
+        model.addAttribute("popularPlaceList", popularPlaceList);
+        System.out.println("popularPlaceList: " + popularPlaceList);
         return "next-page";
     }
 
@@ -162,41 +174,47 @@ public class MainController {
                                  @RequestParam(value="gameType", defaultValue="worldcup") String gameType,
                                  Authentication authentication) {
         try {
-            // 1. 기존 전체 카운트 증가
+            // 1. 음식 전체 승리 카운트 증가
             userService.updateFoodWinCount(foodId);
 
-            // 2. game 테이블 상세 기록 저장
+            // 2. Game 객체 생성 및 기본 정보 설정
             Game game = new Game();
             game.setFood_id(foodId);
             game.setGameType(gameType);
-            game.setPlayDate(LocalDateTime.now()); // java.time.LocalDateTime
+            game.setPlayDate(LocalDateTime.now());
+            game.setUser_id(null); // 기본값은 비로그인(null)
 
-            // 3. 로그인 사용자 정보 처리
+            // 3. 로그인 사용자 정보 처리 (통합 버전)
             if (authentication != null && authentication.isAuthenticated()) {
-                String userId = authentication.getName(); // 기본 ID 추출
+                // 시큐리티에서 현재 로그인한 ID 추출
+                String loginName = authentication.getName();
 
-                // 소셜 로그인 접두어 처리 로직
+                // 소셜 로그인 여부 확인 및 ID 조합 (기존 UserService 로직 활용)
                 String registrationId = "";
-                if (authentication instanceof org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) {
-                    registrationId = ((org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
+                if (authentication instanceof org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken token) {
+                    registrationId = token.getAuthorizedClientRegistrationId();
                 }
 
-                // DB 조회용 fullUserId 조합 (예: kakao_4746951582)
-                String fullUserId = (registrationId == null || registrationId.isEmpty() || userId.startsWith(registrationId))
-                        ? userId : registrationId + "_" + userId;
+                // 통합된 ID 규칙 적용 (일반/관리자는 loginName 그대로, 소셜은 prefix_loginName)
+                String fullUserId = (registrationId == null || registrationId.isEmpty() || loginName.startsWith(registrationId))
+                        ? loginName : registrationId + "_" + loginName;
 
-                // DB에서 유저 객체를 찾아 PK(숫자)를 가져옵니다.
+                // 통합된 user 테이블에서 사용자 조회
                 User user = userService.findById(fullUserId);
+
                 if (user != null) {
-                    game.setUser_id(user.getUser_id()); // Long 타입 PK 저장
-                    System.out.println("로그인 유저의 실제 PK: " + user.getUser_id());
+                    // 관리자든 일반 유저든 찾은 User 객체의 ID를 game의 user_id에 저장
+                    game.setUser_id(user.getUser_id());
+                    System.out.println("게임 기록 저장 대상 ID: " + user.getUser_id() + " (권한: " + user.getRole() + ")");
                 }
             }
 
+            // 4. 게임 기록 저장 (로그인 여부와 상관없이 실행)
             gameService.insertGameRecord(game);
             return "success";
+
         } catch (Exception e) {
-            e.printStackTrace(); // 빨간 줄 대신 로그를 남겨서 확인
+            log.error("월드컵 기록 저장 중 에러 발생: ", e);
             return "fail";
         }
     }

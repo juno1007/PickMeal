@@ -169,12 +169,22 @@
 
     // [수정] 최종 월드컵 스타일 결과창 및 풍성한 폭죽 연출
     function showFinalCHAMPION(winner) {
-        // 우승 카운트 업데이트 API 호출
-        if (winner.foodId) {
-            fetch('/worldcup/win/' + winner.foodId + '?gameType=capsule', { method: 'POST' })
-    .catch(e => {});
-        }
+    // 1. 헤더에서 CSRF 토큰과 헤더 이름 가져오기
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
 
+    if (winner.foodId) {
+        fetch('/worldcup/win/' + winner.foodId + '?gameType=capsule', {
+            method: 'POST',
+            headers: {
+                // [중요] 시큐리티 인증을 위해 CSRF 토큰을 반드시 실어줍니다.
+                [csrfHeader]: csrfToken
+            }
+        })
+        .then(res => res.text())
+        .then(data => console.log("저장 결과:", data))
+        .catch(e => console.error("에러 발생:", e));
+    }
         const rs = document.getElementById('result-screen');
         rs.style.display = 'none';
 

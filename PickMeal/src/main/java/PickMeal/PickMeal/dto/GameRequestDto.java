@@ -8,17 +8,17 @@ import java.util.List;
 @Getter
 @Setter
 public class GameRequestDto {
-    private Integer category_korean;
-    private Integer category_western;
-    private Integer category_chinese;
-    private Integer category_japanese;
-    private Integer category_asian;
+    private Integer categoryKorean;
+    private Integer categoryWestern;
+    private Integer categoryChinese;
+    private Integer categoryJapanese;
+    private Integer categoryAsian;
 
-    private Integer is_spicy;
-    private Integer is_soup;
-    private Integer is_fried;
-    private Integer is_roasted;
-    private Integer has_pork;
-    private Integer has_beef;
+    private Integer isSpicy;
+    private Integer isSoup;
+    private Integer isFried;
+    private Integer isRoasted;
+    private Integer hasPork;
+    private Integer hasBeef;
     private List<Integer> askedQuestionIds;
 }

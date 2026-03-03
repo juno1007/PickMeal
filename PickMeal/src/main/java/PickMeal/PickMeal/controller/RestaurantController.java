@@ -139,4 +139,15 @@ public class RestaurantController {
         reviewWishMapper.deleteReview(reviewId);
         return "success";
     }
+
+    @GetMapping("/restaurant/detail/{restId}")
+    public String getRestaurantDetail(@PathVariable Long restId){
+
+        //RestaurantDTO restaurant = restaurantService.getRestaurantDetail(restId);
+
+
+
+        return "";
+    }
+
 }

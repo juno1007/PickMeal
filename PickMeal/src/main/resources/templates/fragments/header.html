@@ -2,6 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
+
 </head>
 <body>
 <header th:fragment="headerFragment" class="fixed top-0 left-0 w-full z-50 px-10 py-6 grid grid-cols-3 items-center bg-white/80 backdrop-blur-md border-b border-gray-100">
@@ -11,8 +12,8 @@
 
     <nav class="flex justify-center items-center gap-10">
 
-        <a href="/hotplace" class="nav-link text-lg  text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">HOT PLACE</a>
-        <a href="/meal-spotter" class="nav-link text-lg  text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">MEAL SPOTTER</a>
+        <a href="/hotplace" class="nav-link text-lg  text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">PLACE</a>
+        <a href="/meal-spotter" class="nav-link text-lg  text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">HOT PLACE</a>
         <a href="/game" class="nav-link text-lg  text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">GAME</a>
         <a href="/board/list" class="nav-link text-lg  text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">BOARD</a>
     </nav>
@@ -24,9 +25,20 @@
         </th:block>
 
         <th:block sec:authorize="isAuthenticated()">
-            <a href="/users/mypage" class="nav-link text-gray-800 hover:text-[#FF8A5B] transition font-black whitespace-nowrap uppercase">MY PAGE</a>
+            <a sec:authorize="hasRole('USER')"
+               href="/users/mypage"
+               class="nav-link text-gray-800 hover:text-[#FF8A5B] transition font-black whitespace-nowrap uppercase">
+                MY PAGE
+            </a>
+            <div sec:authorize="hasRole('ADMIN')"
+                 class="flex items-center gap-2 px-4 py-1 bg-gray-100 rounded-full border border-gray-200">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Admin Mode : </span>
+                <span class="text-sm font-black text-[#FF8A5B]">
+            관리자 <span th:text="${#authentication.name}"></span>님</span>
+            </div>
             <form th:action="@{/users/logout}" method="post" class="inline">
-                <button type="submit" class="nav-link text-[#FF8A5B] font-black italic bg-transparent border-0 cursor-pointer hover:scale-105 transition whitespace-nowrap">
+                <button type="submit"
+                        class="nav-link text-[#FF8A5B] font-black italic bg-transparent border-0 cursor-pointer hover:scale-105 transition whitespace-nowrap">
                     LOGOUT
                 </button>
             </form>

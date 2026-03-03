@@ -18,4 +18,5 @@ public class PlaceStatsDto {
     private boolean liked;
     private int rating;
     private double avgRating;
+    private String placeName;
 }

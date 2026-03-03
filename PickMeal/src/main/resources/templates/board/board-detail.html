@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +9,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&family=Jua&family=Nanum+Gothic:wght@700;800&family=Gamja+Flower&family=Black+Han+Sans&display=swap" rel="stylesheet">
   <style>
-    /* 학생님의 기존 CSS 스타일 100% 보존 */
-    body { font-family: 'Fredoka', sans-serif; background-color: #FFF5F0; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+    body { font-family: 'Fredoka', sans-serif; background-color: #FFF5F0; margin: 0; overflow-y: auto; height: 100vh; display: flex; flex-direction: column; }
     .nav-link { font-family: 'Fredoka', sans-serif; font-weight: 700; font-style: italic; }
     main { padding: 40px 20px; display: flex; flex-direction: column; align-items: center; }
     .main-title-area { text-align: left; width: 100%; max-width: 900px; margin-bottom: 20px; }
@@ -44,12 +43,14 @@
     .comment-date { color: #999; font-size: 0.9em; margin-left: 10px; }
     .comment-content { color: #444; line-height: 1.6; font-size: 1.1em; white-space: pre-wrap; }
     .btn-text { background: none; border: none; color: #999; font-size: 0.9em; cursor: pointer; padding: 0 5px; }
+    .notice-info-box { background-color: #FFF9F5; border: 2px dashed #FF7F50; border-radius: 15px; padding: 20px; text-align: center; color: #FF7F50; font-family: 'Jua', sans-serif; font-size: 1.2em; margin-top: 20px; }
   </style>
 </head>
 <body>
 
 <header th:replace="~{fragments/header :: headerFragment}"></header>
-<div class="overflow-y-auto flex-grow" >
+
+<div class="overflow-y-auto flex-grow">
   <main class="flex items-center justify-center content-slide-up py-10">
     <div class="main-title-area">
       <h1>COMMUNITY BOARD</h1>
@@ -58,7 +59,10 @@
 
     <div class="board-container">
       <div class="board-header">
-        <h2 class="board-title" th:text="${board.title}">게시글 제목</h2>
+        <h2 class="board-title">
+          <span th:if="${board.is_notice == 'Y'}" class="bg-[#FF7F50] text-white text-xs px-2 py-1 rounded-md align-middle mr-2">NOTICE</span>
+          <span th:text="${board.title}">게시글 제목</span>
+        </h2>
         <div class="board-meta">
           <div>
             <span th:text="'글쓴이 : ' + ${board.nickname}">작성자</span>
@@ -87,14 +91,21 @@
 
       <div class="board-buttons">
         <a href="/board/list" class="btn btn-light">목록으로</a>
-        <th:block th:if="${isWriter}">
-          <a th:href="@{/board/edit/{boardId}(boardId=${board.boardId})}" class="btn btn-orange">수정</a>
-          <button type="button" class="btn btn-danger" th:boardId="${board.boardId}" onclick="deleteBoard(this.getAttribute('boardId'))">삭제</button>
-        </th:block>
+
+        <a th:if="${isWriter}"
+           th:href="@{/board/edit/{boardId}(boardId=${board.boardId})}"
+           class="btn btn-orange">수정</a>
+
+        <button th:if="${isWriter or #authorization.expression('hasRole(''ROLE_ADMIN'')')}"
+                type="button"
+                class="btn btn-danger"
+                th:attr="data-boardId=${board.boardId}"
+                onclick="deleteBoard(this.getAttribute('data-boardId'))">삭제</button>
       </div>
 
       <hr class="my-5">
-      <div class="comment-container">
+
+      <div th:if="${board.is_notice == 'N'}" class="comment-container">
         <h3 class="comment-title">댓글 <span th:text="${#lists.size(comments)}">0</span></h3>
 
         <form class="comment-form" th:action="@{/comment/write/{boardId}(boardId=${board.boardId})}" th:method="post" onsubmit="return handleCommentSubmit(event)">
@@ -118,8 +129,9 @@
                   <span class="comment-date" th:if="${comment.updateCommentDate == null}" th:text="${#dates.format(comment.createCommentDate, 'yyyy-MM-dd HH:mm')}">작성일</span>
                   <span class="comment-date" th:if="${comment.updateCommentDate != null}" th:text="${#dates.format(comment.updateCommentDate, 'yyyy-MM-dd HH:mm')} + ' (수정됨)'">수정일</span>
                 </div>
-                <div th:if="${user != null and user.user_id == comment.user_id}" style="display: flex; gap: 5px;">
-                  <button type="button" class="btn-text" th:onclick="|toggleEditMode(${comment.comment_id})|">수정</button>
+                <div th:if="${user != null and (user.user_id.equals(comment.user_id) or #authorization.expression('hasRole(''ROLE_ADMIN'')'))}" style="display: flex; gap: 5px;">
+                  <button th:if="${user.user_id.equals(comment.user_id)}" type="button" class="btn-text" th:onclick="|toggleEditMode(${comment.comment_id})|">수정</button>
+
                   <form th:action="@{/comment/delete/{comment_id}(comment_id=${comment.comment_id})}" method="post" style="margin:0;">
                     <input type="hidden" name="boardId" th:value="${board.boardId}">
                     <button type="submit" class="btn-text" onclick="return confirm('댓글을 정말 삭제하시겠습니까?');">삭제</button>
@@ -142,6 +154,10 @@
           </div>
         </div>
       </div>
+
+      <div th:if="${board.is_notice == 'Y'}" class="notice-info-box">
+        📢 이 게시글은 공지사항으로 댓글 작성이 제한됩니다.
+      </div>
     </div>
   </main>
   <footer th:replace="~{fragments/footer :: footerFragment}"></footer>
@@ -149,16 +165,18 @@
 
 <script th:inline="javascript">
   const currentUser = /*[[${user}]]*/ null;
+  // 세션이 아닌 시큐리티 권한으로 관리자 여부 확인 (Boolean값 반환)
+  const currentAdmin = /*[[${#authorization.expression('hasRole(''ROLE_ADMIN'')')}]]*/ false;
 
   function checkAuth() {
-      if (!currentUser) {
-          if (confirm("로그인한 회원만 이용할 수 있습니다. \n로그인 페이지로 이동하시겠습니까?")) {
-              location.href = "/users/login";
-          }
-          return false;
-      }
-      return true;
-  }
+    if (!currentUser && !currentAdmin) {
+        if (confirm("로그인한 회원만 이용할 수 있습니다. \n로그인 페이지로 이동하시겠습니까?")) {
+            location.href = "/users/login";
+        }
+        return false;
+    }
+    return true;
+}
 
   function handleCommentSubmit(event) {
       if (!checkAuth()) {
@@ -173,11 +191,13 @@
           const form = document.createElement('form');
           form.method = 'post';
           form.action = `/board/remove/${encodeURIComponent(boardId)}`;
+
           const csrfToken = document.querySelector('meta[name="_csrf"]').content;
           const csrfInput = document.createElement('input');
           csrfInput.type = 'hidden';
           csrfInput.name = '_csrf';
           csrfInput.value = csrfToken;
+
           form.appendChild(csrfInput);
           document.body.appendChild(form);
           form.submit();
@@ -188,8 +208,10 @@
       if (!checkAuth()) return;
       const csrfToken = document.querySelector('meta[name="_csrf"]').content;
       const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
       const formData = new FormData();
       formData.append("like_type", likeType);
+
       fetch(`/board/reaction/${boardId}`, {
           method: "POST",
           headers: { [csrfHeader]: csrfToken },

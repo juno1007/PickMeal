@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="PickMeal.PickMeal.mapper.QuestionsMapper">
+
+    <resultMap id="QuestionsResultMap" type="PickMeal.PickMeal.domain.Questions">
+        <id property="question_id" column="question_id"/>
+        <result property="question_text" column="question_text"/>
+        <result property="attribute_name" column="attribute_name"/>
+    </resultMap>
+
     <select id="getFinalQuestion" resultType="String">
-        SELECT question_text FROM questions WHERE attribute_name = 'final_recommendation';
+        SELECT question_text
+        FROM questions
+        WHERE attribute_name = 'final_choice'
+        LIMIT 1
     </select>
-    <select id="getNextValidQuestion" resultType="PickMeal.PickMeal.domain.Questions" parameterType="java.util.List">
+
+    <select id="getQuestionsByAttributeName" resultMap="QuestionsResultMap">
         SELECT question_id, question_text, attribute_name
         FROM questions
-        WHERE question_id NOT IN
-        <foreach collection="list" item="id" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </select>
-    <select id="getQuestionsByAttributeName" resultType="PickMeal.PickMeal.domain.Questions" parameterType="String">
-        SELECT question_id, question_text, attribute_name
-        FROM questions
-        WHERE attribute_name = #{attributeName}
+        WHERE attribute_name = #{category}
     </select>
 </mapper>

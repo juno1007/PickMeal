@@ -43,7 +43,7 @@ public interface UserMapper {
 
     void updateWinCount(Long id);
 
-    String findByUser_id(Long userId);
+    User findByUser_id(Long userId);
 
     /**
      * 이름과 이메일로 아이디 조회 (아이디 찾기용)
@@ -54,8 +54,6 @@ public interface UserMapper {
      * 아이디, 이메일로 일치하는 회원 확인 (비밀번호 찾기 전 본인 인증용)
      */
     User findUserByIdAndEmail(@Param("id") String id, @Param("email") String email);
-
-    List<String> getDislikedCategories(Long userId);
 
     String getLikedMenuString(Long userId);    // 선호 음식 가져오기
 
