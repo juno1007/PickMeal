@@ -1,31 +1,98 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Meal-Spotter | 맛집 탐지기</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pick Meal - Meal Spotter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=24546b16104e0273c6d8c5c4cc508b44&libraries=services"></script>
     <style>
-        body { font-family: 'Fredoka', sans-serif; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        body { font-family: 'Fredoka', sans-serif; background-color: #fff; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        header, header *, .italic-text { font-style: italic !important; }
         .main-container { flex-grow: 1; display: flex; margin-top: 80px; overflow: hidden; height: calc(100vh - 140px); }
         .side-panel { width: 380px; background: white; border-right: 1px solid #eee; display: flex; flex-direction: column; z-index: 10; height: 100%; }
-        #map { flex-grow: 1; height: 100%; }
-        .place-list { flex-grow: 1; overflow-y: auto; padding: 10px; }
-        .place-item { padding: 20px; border-bottom: 1px solid #f9f9f9; cursor: pointer; transition: 0.2s; position: relative; }
-        .place-item:hover { background: #fffaf8; border-left: 6px solid #FF8A5B; }
+        .filter-header-section { padding: 12px 18px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #f5f5f5; }
 
-        /* [추가] 리뷰 목록 팝업 스타일 */
-        #reviewListModal {
-            position: fixed; z-index: 3000; left: 0; top: 0;
-            width: 100%; height: 100%; background-color: rgba(0,0,0,0.6);
-            display: none; align-items: center; justify-content: center;
+        .location-badge { background-color: #FF8A5B; color: white; padding: 10px 14px; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 13px; text-align: center; font-style: italic; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+
+}
+/* 페이지네이션 스타일 */
+.pagination { display: flex; justify-content: center; gap: 10px; padding: 15px 0; border-top: 1px solid #eee; background: white; }
+.pagination a { cursor: pointer; font-weight: 800; color: #ccc; font-style: italic; transition: 0.2s; padding: 2px 6px; }
+.pagination a.on { color: #FF8A5B; border-bottom: 2px solid #FF8A5B; }
+.pagination a:hover { color: #FF8A5B; }
+
+        .food-badge { background-color: #FFB74D; border-color: #FFB74D; }
+        .location-badge:hover {
+    transform: translateY(-2px); /* 위로 살짝 떠오름 */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* 그림자 강화 */
+    filter: brightness(1.05); /* 색상을 5% 밝게 하여 강조 */
+}
+
+/* [추가] 클릭 시(Active) 꾹 눌리는 효과 */
+.location-badge:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+        .ani-btn {
+            display: flex; align-items: center; gap: 4px; transition: all 0.2s ease-in-out;
+            cursor: pointer; border: none; background: none; padding: 0;
+            font-size: 1.2rem; color: transparent; -webkit-text-stroke: 1.5px #666;
         }
-        #reviewListModal .modal-content {
-            background-color: white; padding: 30px; border-radius: 20px;
-            width: 450px; max-height: 80vh; overflow-y: auto; position: relative;
+        .ani-btn:hover {
+    transform: scale(1.2); /* 1.2배로 부드럽게 커짐 */
+}
+
+.ani-btn:hover {
+    -webkit-text-stroke: 1.5px #444; /* 테두리 선을 조금 더 진하게 */
+}
+
+        .ani-btn.liked { color: #FF4757 !important; -webkit-text-stroke: 1.5px #FF4757; }
+        .ani-btn.animate { animation: heart-pop 0.4s ease-out; }
+        @keyframes heart-pop { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
+        .heart-count-text { color: #444; font-size: 13px; font-weight: 700; -webkit-text-stroke: 0; }
+
+        .star-rating { display: flex; flex-direction: row-reverse; justify-content: center; gap: 4px; margin-bottom: 5px; }
+        .star-rating input { display: none; }
+        .star-rating label { font-size: 2rem; color: #ccc; cursor: pointer; transition: 0.2s; }
+        .star-rating input:checked ~ label, .star-rating label:hover, .star-rating label:hover ~ label { color: #FFB74D; }
+
+        .custom-pin {
+            width: 32px; height: 32px; background: #FF8A5B; border-radius: 50% 50% 50% 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: rotate(-45deg); cursor: pointer; display: flex; align-items: center; justify-content: center;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.2); border: 2px solid white;
         }
-        .close { position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #aaa; }
+        .custom-pin:hover {
+    transform: rotate(-45deg) scale(1.2) translateY(-5px) !important;
+    /* 기존 -45도 회전을 유지하면서, 1.2배 커지고 위로 5px 이동 */
+    background: #FF4757 !important; /* 호버 시 색상을 좀 더 진한 빨강으로 변경 (선택사항) */
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+        .custom-pin::after { content: ''; width: 9px; height: 9px; background: white; border-radius: 50%; }
+        .pin-tooltip { padding: 10px 15px; background: white; border-radius: 12px; border: 2px solid #FF8A5B; font-weight: 800; color: #333; box-shadow: 0 4px 12px rgba(0,0,0,0.15); white-space: nowrap; pointer-events: none; }
+
+        #map { flex-grow: 1; height: 100%; }
+        .place-list { flex-grow: 1; overflow-y: auto; }
+        .place-item { padding: 20px; border-bottom: 1px solid #f9f9f9; cursor: pointer; transition: 0.2s; }
+        .place-item:hover { background: #fffaf8; border-left: 6px solid #FF8A5B; }
+        .info-btn { display: inline-block; margin-top: 10px; padding: 6px 14px; background: #f3f4f6; color: #6b7280; border-radius: 8px; font-size: 11px; font-weight: 800; text-decoration: none; font-style: italic; border: none; cursor: pointer; }
+        .info-btn:hover { background: #FF8A5B; color: white; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999; }
+        .modal-window { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 24px; z-index: 1000; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .active-item { background-color: #fff5f0 !important; color: #FF8A5B !important; font-weight: 800; }
+        .scroller::-webkit-scrollbar { width: 5px; }
+        .scroller::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.05); border-radius: 10px; }
+
+        .review-card { padding: 15px; border-bottom: 1px solid #f0f0f0; background: white; margin-bottom: 8px; border-radius: 12px; position: relative; }
+        .review-user { font-weight: 800; color: #FF8A5B; font-size: 13px; margin-bottom: 4px; font-style: italic; }
+        .review-text { font-weight: 600; color: #444; font-size: 14px; line-height: 1.4; }
+        .edit-label { position: absolute; top: 12px; right: 15px; font-size: 11px; color: #bbb; font-weight: 800; cursor: pointer; font-style: italic; }
+        .edit-label:hover { color: #FF8A5B; }
     </style>
 </head>
 <body>
@@ -34,258 +101,447 @@
 
 <div class="main-container">
     <aside class="side-panel">
-        <div id="placesList" class="place-list">
-            <div th:each="res : ${restaurantList}"
-                 class="place-item border-b border-gray-100 py-5 px-6 hover:bg-gray-50 transition cursor-pointer"
-                 th:onclick="|handleStoreClick(${res.restId}, ${res.restLat}, ${res.restLng})|">
+        <div class="filter-header-section">
+            <div class="location-badge" id="btn-area-open"><span id="display-area">📍 지역을 선택하세요</span></div>
+            <div class="location-badge food-badge" id="btn-food-open"><span id="display-food">🍴 음식 종류 선택</span></div>
 
-                <h4 class="font-bold ..." th:text="${res.restName}">식당이름</h4>
-
-                <div class="wish-btn text-xl flex items-center gap-1 cursor-pointer"
-                     th:onclick="'toggleWish(event, ' + ${res.restId} + ')'">
-                    <span th:id="'heart-shape-' + ${res.restId}">[[${res.isWished ? '❤️' : '🤍'}]]</span>
-                    <span th:id="'wish-count-' + ${res.restId}" class="wish-count text-sm"
-                          th:text="${res.wishCount != null ? res.wishCount : 0}">0</span>
-                </div>
-
-                <p class="text-[12px] ..." th:text="${res.restAddress}">식당 주소</p>
-
-                <p class="text-[12px] ..." th:text="|대표메뉴 : ${res.restMenu}|">대표메뉴</p>
-
-                <div class="flex items-center gap-3">
-                    <span class="...">👁️ [[${res.restViews}]]</span>
-
-                    <span class="..." th:onclick="showReviewList([[${res.restId}]], [[${res.restName}]])">
-            📝 <span th:id="'review-count-' + ${res.restId}"
-                    th:text="${res.reviewCount}">0</span>
-        </span>
-
-                    <button class="..." th:onclick="'openReviewModal(event, ' + ${res.restId} + ')'">EVALUATION</button>
+            <div class="relative mt-2 flex items-center gap-2">
+                <div class="relative flex-grow">
+                    <input type="text" id="keywordInput"
+                           class="w-full p-3 pr-10 rounded-xl border-2 border-gray-100 outline-none focus:border-[#FF8A5B] transition-all font-semibold text-sm"
+                           placeholder="가게명 혹은 키워드 입력">
+                    <button id="btnSearch" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#FF8A5B] hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
+
+        <div id="placesList" class="place-list scroller"></div>
+
+        <div id="pagination" class="pagination"></div>
     </aside>
     <div id="map"></div>
 </div>
 
-<div id="reviewListModal">
-    <div class="modal-content">
-        <span class="close" onclick="closeReviewListModal()">&times;</span>
-        <h2 id="modalRestName" class="text-xl font-black italic text-[#FF8A5B] mb-4">식당 이름</h2>
-        <hr class="mb-4">
-        <div id="reviewListContainer">
-        </div>
+<div class="modal-overlay" id="overlay"></div>
+
+<div class="modal-window w-[600px]" id="modal-area">
+    <div class="p-4 bg-[#FF8A5B] text-white font-black text-center italic">SELECT AREA</div>
+    <div class="flex h-[350px]">
+        <ul id="sidoList" class="w-1/3 overflow-y-auto p-2 border-r scroller"></ul>
+        <ul id="sigugunList" class="w-1/3 overflow-y-auto p-2 border-r scroller"></ul>
+        <ul id="dongList" class="w-1/3 overflow-y-auto p-2 scroller"></ul>
     </div>
 </div>
 
-<script th:inline="javascript">
-    // 1. 지도 초기화 (위도/경도 설정)
-    var map = new kakao.maps.Map(document.getElementById('map'), {
-        center: new kakao.maps.LatLng(37.49027, 126.92753),
-        level: 3
-    });
+<div class="modal-window w-[500px]" id="modal-food">
+    <div class="p-4 bg-[#FFB74D] text-white font-black text-center italic">SELECT FOOD</div>
+    <div class="flex h-[350px]">
+        <ul id="foodCategoryList" class="w-1/2 overflow-y-auto p-2 border-r scroller"></ul>
+        <ul id="foodNameList" class="w-1/2 overflow-y-auto p-2 scroller"></ul>
+    </div>
+</div>
 
-    // 2. 마커 표시 로직 (DTO 필드명 연동)
-    const restaurants = /*[[${restaurantList}]]*/ [];
-
-    restaurants.forEach(res => {
-    // 1. 마커 생성 로직
-    const marker = new kakao.maps.Marker({
-        map: map,
-        position: new kakao.maps.LatLng(res.restLat, res.restLng),
-        image: new kakao.maps.MarkerImage('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png', new kakao.maps.Size(24, 35))
-    });
-
-    // 2. 커스텀 오버레이 생성 로직
-    const content = '<div class="custom-overlay" style="padding:10px; background:white; border:2px solid #FF8A5B; border-radius:15px; box-shadow:0 2px 10px rgba(0,0,0,0.1); min-width:150px;">' +
-        '<div style="font-weight:bold; font-size:14px; margin-bottom:8px; text-align:center; border-bottom:1px solid #eee; padding-bottom:5px; color:#333;">' +
-            res.restName +
-        '</div>' +
-        '<div style="display:flex; justify-content:center; gap:10px; font-size:12px; color:#666;">' +
-            '<span>👁️ ' + res.restViews + '</span>' +
-            '<span style="color:#FF4081;">❤️ <span id="wish-count-' + res.restId + '">' + (res.wishCount ? res.wishCount : 0) + '</span></span>' +
-            '<span style="color:#4CAF50;">📝 ' + (res.reviewCount ? res.reviewCount : 0) + '</span>' +
-    '</div>' +
-        '</div>' +
-    '</div>';
-
-    const overlay = new kakao.maps.CustomOverlay({
-        content: content,
-        position: marker.getPosition(),
-        yAnchor: 1.5 //
-    });
-
-    // ★ [중요] 상태 변수는 마커 생성 직후에 선언되어야 합니다!
-    let isOpen = false;
-
-    // 3. 마커 클릭 시 켜고 끄기 로직 (객체 존재 여부로 판단)
-    kakao.maps.event.addListener(marker, 'click', function() {
-        // 현재 오버레이가 지도(map) 위에 올라가 있는지 직접 물어봅니다.
-        if (!overlay.getMap()) {
-            // 지도에 없다면 -> 띄웁니다.
-            overlay.setMap(map);
-            handleStoreClick(res.restId, res.restLat, res.restLng); // 조회수 증가 실행
-        } else {
-            // 이미 지도에 있다면 -> 지웁니다.
-            overlay.setMap(null);
-        }
-    });
-});
-
-    // 기능 함수들
-    function handleStoreClick(restId, lat, lng) {
-        map.panTo(new kakao.maps.LatLng(lat, lng));
-        // 비동기로 조회수 증가 요청 (Fetch API)
-        fetch('/api/restaurant/view/' + restId, { method: 'POST' });
-    }
-
-    function toggleWish(event, restId) {
-    // 1. 이벤트 전파 방지: 하트를 눌렀을 때 식당 상세페이지로 이동하는 것을 막습니다.
-    event.stopPropagation();
-
-    // 2. 서버에 찜 상태 변경 요청 (POST 방식)
-    fetch(`/api/wishlist/${restId}`, { method: 'POST' })
-    .then(res => res.text())
-    .then(data => {
-        // 3. 서버 응답이 숫자인지 확인 (정상적인 최신 찜 개수인지 확인)
-        if (!isNaN(data)) {
-            const totalWishCount = parseInt(data);
-
-            // [핵심 1] 본점(리스트) 하트 모양과 숫자를 '즉시' 바꿉니다. (사용자 체감 속도 UP!)
-            const listHearts = document.querySelectorAll(`[id="heart-shape-${restId}"]`);
-            listHearts.forEach(span => {
-                // 숫자가 0보다 크면 내가 찜한 상태이므로 빨간 하트, 아니면 빈 하트로 표시합니다.
-                span.innerText = (totalWishCount > 0) ? '❤️' : '🤍';
-            });
-
-            const listCounts = document.querySelectorAll(`[id="wish-count-${restId}"]`);
-            listCounts.forEach(el => {
-                el.innerText = totalWishCount; // 리스트의 숫자판을 최신 값으로 교체
-            });
-
-            // [핵심 2] 분점(지도 팝업)은 그려지는 시간이 필요하므로 0.1초의 여유를 줍니다.
-            setTimeout(() => {
-                // 0.1초 뒤에 화면 전체를 다시 훑어서 지도 위에 새로 생긴 팝업의 숫자판을 찾아 바꿉니다.
-                const allCounts = document.querySelectorAll(`[id="wish-count-${restId}"]`);
-                allCounts.forEach(el => {
-                    el.innerText = totalWishCount;
-                });
-
-                // [핵심 3] 모든 전광판이 다 바뀐 것을 눈으로 확인한 '직후'에 안내창을 띄웁니다.
-                // 이 순서여야만 알림창 때문에 화면이 멈추는 현상이 발생하지 않습니다.
-                alert("찜 상태가 변경되었습니다! ❤️");
-            }, 100);
-
-        } else {
-            // 서버에서 숫자가 아닌 메시지가 왔을 때 (예: "로그인이 필요합니다")
-            alert(data);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert("통신 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
-    });
-}
-
-// 리뷰 목록 가져오기
-    function showReviewList(restId, restName) {
-        fetch(`/api/reviews/${restId}`)
-            .then(res => {
-                if (!res.ok) throw new Error('Network response was not ok');
-            return res.json();
-            })
-            .then(data => {
-                const container = document.getElementById('reviewListContainer');
-                document.getElementById('modalRestName').innerText = restName + " 리뷰 📝";
-                container.innerHTML = "";
-
-                if (data.length === 0) {
-                    container.innerHTML = "<p class='text-center py-5'>아직 리뷰가 없습니다. 😊</p>";
-                } else {
-                    data.forEach(review => {
-                        const item = `
-                            <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
-                                <strong>👤 ${review.userId}</strong> <span style="color:#ff9f43">⭐ ${review.rating}</span>
-                                <p>${review.content}</p>
-                                <small style="color:#999">${review.createdAt}</small>
-                            </div>`;
-                        container.innerHTML += item;
-                    });
-                }
-                document.getElementById('reviewListModal').style.display = "flex";
-            })
-            .catch(err => {
-        // [추가] 통신 중 에러가 발생하면 콘솔창에 빨간색으로 표시해줍니다.
-        console.error("리뷰 로드 실패:", err);
-    });
-    }
-
-    function closeReviewListModal() {
-        document.getElementById('reviewListModal').style.display = "none";
-    }
-
-    // [추가] 1. 리뷰 작성창 열기 함수
-    function openReviewModal(event, restId) {
-    // 식당 리스트 자체를 클릭하는 이벤트와 겹치지 않게 방지합니다.
-    event.stopPropagation();
-
-    // 어느 식당에 리뷰를 쓰는지 번호(ID)를 숨겨진 입력창에 저장합니다.
-    document.getElementById('targetRestId').value = restId;
-
-    // 숨겨져 있던 리뷰 작성 모달창(reviewModal)을 화면에 보이게 합니다.
-    document.getElementById('reviewModal').classList.remove('hidden');
-}
-
-    // [추가] 2. 리뷰 작성창 닫기 함수 (취소 버튼용)
-    function closeReviewModal() {
-    document.getElementById('reviewModal').classList.add('hidden'); // 창을 숨깁니다.
-    document.getElementById('reviewContent').value = ""; // 입력했던 내용을 지웁니다.
-}
-
-    // 리뷰 저장
-    function submitReview() {
-        const resId = document.getElementById('targetRestId').value;
-        const data = {
-            resId: resId,
-            rating: document.getElementById('reviewRating').value,
-            content: document.getElementById('reviewContent').value
-        };
-
-        fetch('/api/review/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        }).then(response => {
-            if (response.ok) {
-                alert("리뷰가 등록되었습니다! 📝");
-                closeReviewModal();
-                location.reload(); // 숫자 업데이트를 위해 새로고침
-            }
-        });
-    }
-</script>
+<div class="modal-window w-[450px]" id="modal-review">
+    <button onclick="closeAll()" class="absolute top-4 right-4 text-white z-20 hover:scale-110 transition-transform">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    </button>
+    <div class="p-4 bg-[#FF8A5B] text-white font-black text-center italic">REVIEWS</div>
+    <div id="reviewList" class="h-[320px] overflow-y-auto scroller p-5 bg-[#fafafa]"></div>
+    <div class="p-4 bg-white border-t flex flex-col gap-3">
+        <input type="hidden" id="editReviewId">
+        <div class="star-rating" id="starRating">
+            <input type="radio" id="5-stars" name="rating" value="5" /><label for="5-stars">★</label>
+            <input type="radio" id="4-stars" name="rating" value="4" /><label for="4-stars">★</label>
+            <input type="radio" id="3-stars" name="rating" value="3" /><label for="3-stars">★</label>
+            <input type="radio" id="2-stars" name="rating" value="2" /><label for="2-stars">★</label>
+            <input type="radio" id="1-stars" name="rating" value="1" /><label for="1-stars">★</label>
+        </div>
+        <textarea id="reviewInput" class="w-full h-20 p-3 border border-gray-200 rounded-xl outline-none resize-none text-sm font-semibold" placeholder="리뷰를 남겨주세요!"></textarea>
+        <div class="flex gap-2">
+            <button id="btnDelete" class="hidden w-1/3 bg-gray-200 text-gray-500 py-3 rounded-xl font-black italic transition-all active:scale-95">DELETE</button>
+            <button id="submitReview" class="flex-1 bg-[#FF8A5B] text-white py-3 rounded-xl font-black italic shadow-md transition-all active:scale-95">POST REVIEW</button>
+        </div>
+    </div>
+</div>
 
 <footer th:replace="~{fragments/footer :: footerFragment}"></footer>
-<div id="reviewModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[1000] flex items-center justify-center">
-    <div class="bg-white p-8 rounded-2xl w-96">
-        <h2 class="text-xl font-black italic text-[#FF8A5B] mb-4">LEAVE A REVIEW</h2>
-        <input type="hidden" id="targetRestId">
-        <div class="mb-4">
-            <label class="block text-sm font-bold mb-2 italic text-gray-400">RATING (1-5)</label>
-            <select id="reviewRating" class="w-full border p-2 rounded-lg italic font-bold text-[#FF8A5B]">
-                <option value="5">⭐⭐⭐⭐⭐ (5점)</option>
-                <option value="4">⭐⭐⭐⭐ (4점)</option>
-                <option value="3">⭐⭐⭐ (3점)</option>
-                <option value="2">⭐⭐ (2점)</option>
-                <option value="1">⭐ (1점)</option>
-            </select>
-        </div>
-        <textarea id="reviewContent" class="w-full border p-3 rounded-lg h-32 mb-4 italic" placeholder="맛은 어떠셨나요?"></textarea>
-        <div class="flex gap-2">
-            <button onclick="closeReviewModal()" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold italic text-gray-400">CANCEL</button>
-            <button onclick="submitReview()" class="flex-1 py-3 bg-[#FF8A5B] text-white rounded-xl font-bold italic">POST</button>
-        </div>
-    </div>
-</div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=24546b16104e0273c6d8c5c4cc508b44&libraries=services"></script>
+<script th:inline="javascript">
+    var map = new kakao.maps.Map(document.getElementById('map'), { center: new kakao.maps.LatLng(37.4980, 127.0276), level: 3 });
+    var ps = new kakao.maps.services.Places();
+    var geocoder = new kakao.maps.services.Geocoder();
+    var currentOverlays = [];
+    var areaData = {}, foodData = {};
+    let currentSelection = { sido: null, sigugun: null, dong: null, foodName: null };
+    let activePlaceId = null;
+    const currentLoginUser = /*[[${#authentication.name}]]*/ 'guest';
+    const keywordInput = document.getElementById('keywordInput');
+    const btnSearch = document.getElementById('btnSearch');
+
+    const overlay = document.getElementById('overlay');
+    const modalArea = document.getElementById('modal-area');
+    const modalFood = document.getElementById('modal-food');
+    const modalReview = document.getElementById('modal-review');
+    const hoverTooltip = new kakao.maps.CustomOverlay({ zIndex: 10, yAnchor: 2.2 });
+
+    function closeAll() { [overlay, modalArea, modalFood, modalReview].forEach(m => m.style.display = 'none'); }
+    document.getElementById('btn-area-open').onclick = () => { overlay.style.display = 'block'; modalArea.style.display = 'block'; loadAreaData(); };
+    document.getElementById('btn-food-open').onclick = () => { overlay.style.display = 'block'; modalFood.style.display = 'block'; loadFoodData(); };
+    overlay.onclick = closeAll;
+
+    function checkLogin() {
+        if (currentLoginUser === 'anonymousUser' || currentLoginUser === 'guest') {
+            if (confirm("로그인이 필요한 서비스입니다. 로그인 페이지로 이동하시겠습니까?")) {
+                location.href = "/users/login";
+            }
+            return false;
+        }
+        return true;
+    }
+
+    async function handleView(id, url) {
+        try { await fetch(`/hotplace/view/${id}`, { method: 'POST' }); window.open(url, '_blank'); updateStats(id); } catch (e) { window.open(url, '_blank'); }
+    }
+
+    async function handleHeart(id, event) {
+        event.stopPropagation();
+        const btn = event.currentTarget;
+        btn.classList.add('animate');
+        setTimeout(() => btn.classList.remove('animate'), 400);
+        if (!checkLogin()) return;
+        const res = await fetch(`/hotplace/heart/${id}`, { method: 'POST' });
+        if (res.ok) {
+            btn.classList.toggle('liked');
+            updateStats(id);
+        }
+    }
+
+    async function openReviewModal(id, event) {
+        if(event) event.stopPropagation();
+        activePlaceId = id; resetReviewForm();
+        overlay.style.display = 'block'; modalReview.style.display = 'block'; loadReviews(id);
+    }
+
+    async function loadReviews(id) {
+        const res = await fetch(`/hotplace/reviews/${id}`);
+        const reviews = await res.json();
+        const listEl = document.getElementById('reviewList');
+        listEl.innerHTML = reviews.length > 0
+            ? reviews.map(r => `
+                <div class="review-card shadow-sm">
+                    <div class="review-user">@${r.nickname}</div>
+                    <div class="review-text">${r.content}</div>
+                    ${r.userId === currentLoginUser ? `<span class="edit-label" onclick="setEditMode('${r.reviewId}', '${r.content}', '${r.rating}')">EDIT</span>` : ''}
+                </div>`).join('')
+            : '<div class="h-full flex items-center justify-center text-gray-400 font-black italic">첫 리뷰를 남겨보세요!</div>';
+    }
+
+    function resetReviewForm() {
+        document.getElementById('editReviewId').value = ''; document.getElementById('reviewInput').value = '';
+        document.getElementById('submitReview').innerText = "POST REVIEW"; document.getElementById('btnDelete').classList.add('hidden');
+        document.querySelectorAll('input[name="rating"]').forEach(el => el.checked = false);
+    }
+
+    function setEditMode(reviewId, content, rating) {
+        document.getElementById('editReviewId').value = reviewId;
+        document.getElementById('reviewInput').value = content;
+        document.getElementById('submitReview').innerText = "UPDATE";
+        document.getElementById('btnDelete').classList.remove('hidden');
+        const starId = Number(rating) + "-stars";
+        const ratingBtn = document.getElementById(starId);
+        if(ratingBtn) ratingBtn.checked = true;
+        document.getElementById('reviewInput').focus();
+    }
+
+    document.getElementById('submitReview').onclick = async () => {
+        if (!checkLogin()) return;
+        const content = document.getElementById('reviewInput').value;
+        const reviewId = document.getElementById('editReviewId').value;
+        const rating = document.querySelector('input[name="rating"]:checked')?.value || 0;
+        if(!content.trim() || rating === 0) { alert("내용과 평점을 모두 입력해주세요!"); return; }
+        const url = reviewId ? `/hotplace/reviews/update/${reviewId}` : `/hotplace/reviews/${activePlaceId}`;
+        const res = await fetch(url, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ content, rating })
+        });
+        if (res.status === 403) { alert("본인이 작성한 리뷰만 수정할 수 있습니다."); return; }
+        if (res.ok) { resetReviewForm(); await loadReviews(activePlaceId); updateStats(activePlaceId); }
+    };
+
+    document.getElementById('btnDelete').onclick = async () => {
+        if (!checkLogin()) return;
+        const reviewId = document.getElementById('editReviewId').value;
+        if (!reviewId || !confirm("이 리뷰를 삭제하시겠습니까?")) return;
+        const res = await fetch(`/hotplace/reviews/delete/${reviewId}`, { method: 'POST' });
+        if (res.ok) { resetReviewForm(); loadReviews(activePlaceId); updateStats(activePlaceId); }
+    };
+
+    async function updateStats(id) {
+        const res = await fetch('/hotplace/stats', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify([id.toString()]) });
+        const data = await res.json();
+        if(data.length > 0) {
+            const s = data[0];
+            document.querySelectorAll(`[id^="avg-rating-${id}"]`).forEach(el => el.innerText = s.avgRating || 0);
+            document.querySelectorAll(`[id^="view-count-${id}"]`).forEach(el => el.innerText = s.viewCount);
+            document.querySelectorAll(`[id^="heart-count-${id}"]`).forEach(el => el.innerText = s.heartCount);
+            document.querySelectorAll(`[id^="review-count-${id}"]`).forEach(el => el.innerText = s.reviewCount);
+            currentOverlays.forEach(o => { if (o.placeId === id) o.stats = s; });
+        }
+    }
+
+    function createCustomPin(position, place, stats) {
+        const content = document.createElement('div'); content.className = 'custom-pin';
+        const pinOverlay = new kakao.maps.CustomOverlay({ position: position, content: content, yAnchor: 1.1 });
+        pinOverlay.placeId = place.id; pinOverlay.stats = stats;
+        content.onmouseover = () => {
+            const s = pinOverlay.stats;
+            const tooltipContent = `
+                <div class="pin-tooltip">
+                    <div class="mb-2 text-[15px] font-black border-b pb-1">${place.place_name}</div>
+                    <div class="flex gap-4 text-[13px] text-orange-500 font-bold italic items-center">
+                        <span class="flex items-center gap-1.5">⭐ <span>${s.avgRating || 0}</span></span>
+                        <span class="flex items-center gap-1.5">👁️ <span>${s.viewCount}</span></span>
+                        <span class="flex items-center gap-1.5">❤️ <span>${s.heartCount}</span></span>
+                        <span class="flex items-center gap-1.5">📝 <span>${s.reviewCount}</span></span>
+                    </div>
+                </div>`;
+            hoverTooltip.setContent(tooltipContent); hoverTooltip.setPosition(position); hoverTooltip.setMap(map);
+        };
+        content.onmouseout = () => hoverTooltip.setMap(null);
+        content.onclick = () => handleView(place.id, place.place_url);
+        pinOverlay.setMap(map); currentOverlays.push(pinOverlay);
+    }
+
+    // [수정] 페이지네이션 매개변수 추가 및 리스트 갱신 로직
+    async function renderPlaces(data, status, pagination) {
+        currentOverlays.forEach(o => o.setMap(null)); currentOverlays = [];
+        const listEl = document.getElementById('placesList');
+        const paginationEl = document.getElementById('pagination');
+        listEl.innerHTML = '';
+        if (paginationEl) paginationEl.innerHTML = '';
+
+        if (status === kakao.maps.services.Status.OK) {
+            const statsRes = await fetch('/hotplace/stats', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data.map(p => p.id)) });
+            const statsList = await statsRes.json();
+            const statsMap = {}; statsList.forEach(s => statsMap[s.kakaoPlaceId] = s);
+
+            data.forEach(place => {
+                const pos = new kakao.maps.LatLng(place.y, place.x);
+                const stats = statsMap[place.id] || { viewCount:0, heartCount: 0, reviewCount: 0, liked: false, avgRating: 0 };
+                if (stats.heartCount >= 5) {
+                    createCustomPin(pos, place, stats);
+                const item = document.createElement('div'); item.className = 'place-item';
+                item.innerHTML = `
+                    <h4 class="font-black text-gray-800 text-xl mb-1 italic">${place.place_name}</h4>
+                    <div class="flex gap-4 mb-2 text-[13px] font-bold text-orange-400 italic items-center">
+                        <span class="flex items-center gap-1.5">⭐ <span id="avg-rating-${place.id}" class="text-gray-700">${stats.avgRating || 0}</span></span>
+                        <span class="flex items-center gap-1.5">👁️ <span id="view-count-${place.id}" class="text-gray-700">${stats.viewCount}</span></span>
+                        <button onclick="handleHeart('${place.id}', event)" class="ani-btn ${stats.liked ? 'liked' : ''}">❤ <span id="heart-count-${place.id}" class="heart-count-text">${stats.heartCount}</span></button>
+                        <div class="flex items-center gap-1">
+                            <span class="flex items-center gap-1.5">📝 <span id="review-count-${place.id}" class="text-gray-700">${stats.reviewCount}</span></span>
+                            <button onclick="openReviewModal('${place.id}', event)" class="px-2 py-0.5 bg-orange-100 text-[#FF8A5B] rounded-md text-[10px] hover:bg-[#FF8A5B] hover:text-white transition-all">WRITE</button>
+                        </div>
+                    </div>
+                    <p class="text-[12px] text-[#FF8A5B] font-black uppercase mb-1 italic">${place.category_name.split('>').pop()}</p>
+                    <p class="text-[13px] text-gray-400 font-bold italic">${place.address_name}</p>
+                    <button onclick="handleView('${place.id}', '${place.place_url}')" class="info-btn">INFO</button>
+                `;
+                item.onclick = (e) => { if(!e.target.closest('button')) map.panTo(pos); };
+                listEl.appendChild(item);
+                }
+            });
+
+            // [추가] 페이지 번호 렌더링 호출
+            if (pagination) renderPagination(pagination);
+        }
+    }
+
+    // [추가] 페이지 번호 생성 함수
+    function renderPagination(pagination) {
+        const paginationEl = document.getElementById('pagination');
+        if (!paginationEl) return;
+
+        for (let i = 1; i <= pagination.last; i++) {
+            const pageLink = document.createElement('a');
+            pageLink.href = "javascript:void(0);";
+            pageLink.innerHTML = i;
+            pageLink.className = (i === pagination.current) ? 'on mx-1' : 'mx-1';
+            pageLink.onclick = () => pagination.gotoPage(i);
+            paginationEl.appendChild(pageLink);
+        }
+    }
+
+    // [추가] 모달 우측 상단 공통 컨트롤 버튼 (RESET, CLOSE)
+    function addModalControls(targetListId, type) {
+        const list = document.getElementById(targetListId);
+        const ctrlLi = document.createElement('li');
+        ctrlLi.className = "sticky top-0 z-20 bg-white p-2 flex gap-2 border-b mb-1";
+        const resetFn = type === 'area' ? 'resetRegionFilter()' : 'resetFoodFilter()';
+        ctrlLi.innerHTML = `
+            <button onclick="${resetFn}" class="flex-1 py-2 text-[11px] bg-gray-100 text-gray-500 rounded-lg font-black italic hover:bg-gray-200 transition-colors">RESET</button>
+            <button onclick="closeAll()" class="flex-1 py-2 text-[11px] bg-red-50 text-red-400 rounded-lg font-black italic hover:bg-red-100 transition-colors">CLOSE</button>
+        `;
+        list.appendChild(ctrlLi);
+    }
+
+    async function loadAreaData() {
+        if (Object.keys(areaData).length) return;
+        try {
+            const res = await fetch('/Korea_city_List.json');
+            areaData = await res.json(); renderSido();
+        } catch(e) { console.error("Area Load Error"); }
+    }
+
+    function renderSido() {
+        const list = document.getElementById('sidoList'); list.innerHTML = '';
+        addModalControls('sidoList', 'area');
+        Object.keys(areaData).forEach(sido => {
+            const li = document.createElement('li'); li.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold";
+            li.innerText = sido;
+            li.onclick = () => { resetActive('sidoList'); li.classList.add('active-item'); currentSelection.sido = sido; renderSigugun(sido); };
+            list.appendChild(li);
+        });
+    }
+
+    function renderSigugun(sido) {
+        const list = document.getElementById('sigugunList'); list.innerHTML = '';
+        const liAll = document.createElement('li');
+        liAll.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold text-blue-500";
+        liAll.innerText = "전체 (시/도)";
+        liAll.onclick = () => {
+            resetActive('sigugunList'); liAll.classList.add('active-item');
+            currentSelection.sigugun = "전체"; currentSelection.dong = null;
+            document.getElementById('display-area').innerText = sido;
+            closeAll(); updateSearch();
+        };
+        list.appendChild(liAll);
+
+        Object.keys(areaData[sido]).forEach(sigu => {
+            const li = document.createElement('li');
+            li.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold";
+            li.innerText = sigu;
+            li.onclick = () => { resetActive('sigugunList'); li.classList.add('active-item'); currentSelection.sigugun = sigu; renderDong(sido, sigu); };
+            list.appendChild(li);
+        });
+    }
+
+    function renderDong(sido, sigu) {
+        const list = document.getElementById('dongList'); list.innerHTML = '';
+        const liAll = document.createElement('li');
+        liAll.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold text-blue-500";
+        liAll.innerText = "전체 (시/구/군)";
+        liAll.onclick = () => {
+            resetActive('dongList'); liAll.classList.add('active-item');
+            currentSelection.dong = "전체";
+            document.getElementById('display-area').innerText = `${sido} ${sigu}`;
+            closeAll(); updateSearch();
+        };
+        list.appendChild(liAll);
+
+        areaData[sido][sigu].forEach(dong => {
+            const li = document.createElement('li');
+            li.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold";
+            li.innerText = dong;
+            li.onclick = () => { currentSelection.dong = dong; document.getElementById('display-area').innerText = `${sido} ${sigu} ${dong}`; closeAll(); updateSearch(); };
+            list.appendChild(li);
+        });
+    }
+
+    async function loadFoodData() {
+        if (Object.keys(foodData).length) return;
+        try {
+            const res = await fetch('/Food_List.json');
+            foodData = await res.json(); renderFoodCategory();
+        } catch(e) { console.error("Food Load Error"); }
+    }
+
+    function renderFoodCategory() {
+        const list = document.getElementById('foodCategoryList'); list.innerHTML = '';
+        addModalControls('foodCategoryList', 'food');
+        Object.keys(foodData).forEach(cat => {
+            const li = document.createElement('li'); li.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold";
+            li.innerText = cat;
+            li.onclick = () => { resetActive('foodCategoryList'); li.classList.add('active-item'); renderFoodNames(cat); };
+            list.appendChild(li);
+        });
+    }
+
+    function renderFoodNames(cat) {
+        const list = document.getElementById('foodNameList'); list.innerHTML = '';
+        // [추가] 음식 카테고리 전체 버튼
+        const liAll = document.createElement('li');
+        liAll.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold text-blue-500";
+        liAll.innerText = `${cat} 전체`;
+        liAll.onclick = () => {
+            resetActive('foodNameList'); liAll.classList.add('active-item');
+            currentSelection.foodName = cat;
+            document.getElementById('display-food').innerText = `${cat} 전체`;
+            closeAll(); updateSearch();
+        };
+        list.appendChild(liAll);
+
+        foodData[cat].forEach(food => {
+            const li = document.createElement('li'); li.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold";
+            li.innerText = food.name;
+            li.onclick = () => { currentSelection.foodName = food.name; document.getElementById('display-food').innerText = food.name; closeAll(); updateSearch(); };
+            list.appendChild(li);
+        });
+    }
+
+    function resetRegionFilter() {
+        currentSelection.sido = null; currentSelection.sigugun = null; currentSelection.dong = null;
+        document.getElementById('display-area').innerText = "📍 지역을 선택하세요";
+        document.getElementById('sigugunList').innerHTML = ''; document.getElementById('dongList').innerHTML = '';
+        closeAll(); updateSearch();
+    }
+
+    function resetFoodFilter() {
+        currentSelection.foodName = null;
+        document.getElementById('display-food').innerText = "🍴 음식 종류 선택";
+        document.getElementById('foodNameList').innerHTML = '';
+        closeAll(); updateSearch();
+    }
+
+    function updateSearch() {
+        let keyword = ""; let searchAddr = "";
+        if (currentSelection.sido) {
+            searchAddr = currentSelection.sido; keyword += currentSelection.sido + " ";
+            if (currentSelection.sigugun && currentSelection.sigugun !== "전체") {
+                searchAddr += " " + currentSelection.sigugun; keyword += currentSelection.sigugun + " ";
+                if (currentSelection.dong && currentSelection.dong !== "전체") {
+                    searchAddr += " " + currentSelection.dong; keyword += currentSelection.dong + " ";
+                }
+            }
+        }
+        if (currentSelection.foodName) keyword += currentSelection.foodName + " ";
+        const userKeyword = keywordInput.value.trim();
+        if (userKeyword) keyword += userKeyword;
+
+        if (!keyword.trim()) { ps.keywordSearch('맛집', renderPlaces); return; }
+
+        geocoder.addressSearch(searchAddr || '서울', (result, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+                map.setCenter(new kakao.maps.LatLng(result[0].y, result[0].x));
+                ps.keywordSearch(keyword, renderPlaces);
+            } else { ps.keywordSearch(keyword, renderPlaces); }
+        });
+    }
+
+    function resetActive(id) {
+        const list = document.getElementById(id);
+        if (list) Array.from(list.children).forEach(li => li.classList.remove('active-item'));
+    }
+
+    window.onload = () => { ps.keywordSearch('맛집', renderPlaces); };
+    btnSearch.onclick = () => updateSearch();
+    keywordInput.onkeypress = (e) => { if (e.key === 'Enter') updateSearch(); };
+</script>
 </body>
 </html>

@@ -236,7 +236,7 @@
         listEl.innerHTML = reviews.length > 0
             ? reviews.map(r => `
                 <div class="review-card shadow-sm">
-                    <div class="review-user">@${r.userId}</div>
+                    <div class="review-user">@${r.nickname}</div>
                     <div class="review-text">${r.content}</div>
                     ${r.userId === currentLoginUser ? `<span class="edit-label" onclick="setEditMode('${r.reviewId}', '${r.content}', '${r.rating}')">EDIT</span>` : ''}
                 </div>`).join('')
@@ -334,6 +334,7 @@
 
             data.forEach(place => {
                 const pos = new kakao.maps.LatLng(place.y, place.x);
+
                 const stats = statsMap[place.id] || { viewCount:0, heartCount: 0, reviewCount: 0, liked: false, avgRating: 0 };
                 createCustomPin(pos, place, stats);
                 const item = document.createElement('div'); item.className = 'place-item';

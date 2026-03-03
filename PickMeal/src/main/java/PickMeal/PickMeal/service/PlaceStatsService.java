@@ -56,14 +56,18 @@ public class PlaceStatsService {
     public List<PlaceStatsDto> getReviews(String kakaoPlaceId) {
         Long resId = Long.parseLong(kakaoPlaceId);
         // [수정] SQL문에 rating 컬럼을 추가해야 합니다.
-        String sql = "SELECT review_id, user_id, content, rating FROM place_stats " +
-                "WHERE res_id = ? AND content IS NOT NULL " +
-                "ORDER BY created_at DESC";
+        String sql = "SELECT p.review_id, p.user_id, u.user_nickname, p.content, p.rating " +
+                "FROM place_stats p " +
+                "LEFT JOIN users u ON p.user_id = u.user_id " + // 사용자 테이블 JOIN
+                "WHERE p.res_id = ? AND p.content IS NOT NULL " +
+                "ORDER BY p.created_at DESC";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             PlaceStatsDto dto = new PlaceStatsDto();
             dto.setReviewId(rs.getLong("review_id"));
             dto.setUserId(rs.getString("user_id"));
+            String nickname = rs.getString("user_nickname");
+            dto.setNickname(nickname != null ? nickname : rs.getString("user_id"));
             dto.setContent(rs.getString("content"));
             // [추가] DB에서 가져온 rating 값을 DTO에 담아줘야 프론트에서 읽을 수 있습니다.
             dto.setRating(rs.getInt("rating"));
