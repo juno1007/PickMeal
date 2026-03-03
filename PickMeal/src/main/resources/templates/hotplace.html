@@ -18,6 +18,12 @@
 
 
 }
+/* 페이지네이션 스타일 */
+.pagination { display: flex; justify-content: center; gap: 10px; padding: 15px 0; border-top: 1px solid #eee; background: white; }
+.pagination a { cursor: pointer; font-weight: 800; color: #ccc; font-style: italic; transition: 0.2s; padding: 2px 6px; }
+.pagination a.on { color: #FF8A5B; border-bottom: 2px solid #FF8A5B; }
+.pagination a:hover { color: #FF8A5B; }
+
         .food-badge { background-color: #FFB74D; border-color: #FFB74D; }
         .location-badge:hover {
     transform: translateY(-2px); /* 위로 살짝 떠오름 */
@@ -112,7 +118,10 @@
                 </div>
             </div>
         </div>
+
         <div id="placesList" class="place-list scroller"></div>
+
+        <div id="pagination" class="pagination"></div>
     </aside>
     <div id="map"></div>
 </div>
@@ -164,7 +173,6 @@
 <footer th:replace="~{fragments/footer :: footerFragment}"></footer>
 
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=24546b16104e0273c6d8c5c4cc508b44&libraries=services"></script>
-
 <script th:inline="javascript">
     var map = new kakao.maps.Map(document.getElementById('map'), { center: new kakao.maps.LatLng(37.4980, 127.0276), level: 3 });
     var ps = new kakao.maps.services.Places();
@@ -311,13 +319,19 @@
         pinOverlay.setMap(map); currentOverlays.push(pinOverlay);
     }
 
-    async function renderPlaces(data, status) {
+    // [수정] 페이지네이션 매개변수 추가 및 리스트 갱신 로직
+    async function renderPlaces(data, status, pagination) {
         currentOverlays.forEach(o => o.setMap(null)); currentOverlays = [];
-        const listEl = document.getElementById('placesList'); listEl.innerHTML = '';
+        const listEl = document.getElementById('placesList');
+        const paginationEl = document.getElementById('pagination');
+        listEl.innerHTML = '';
+        if (paginationEl) paginationEl.innerHTML = '';
+
         if (status === kakao.maps.services.Status.OK) {
             const statsRes = await fetch('/hotplace/stats', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data.map(p => p.id)) });
             const statsList = await statsRes.json();
             const statsMap = {}; statsList.forEach(s => statsMap[s.kakaoPlaceId] = s);
+
             data.forEach(place => {
                 const pos = new kakao.maps.LatLng(place.y, place.x);
                 const stats = statsMap[place.id] || { viewCount:0, heartCount: 0, reviewCount: 0, liked: false, avgRating: 0 };
@@ -341,12 +355,51 @@
                 item.onclick = (e) => { if(!e.target.closest('button')) map.panTo(pos); };
                 listEl.appendChild(item);
             });
+
+            // [추가] 페이지 번호 렌더링 호출
+            if (pagination) renderPagination(pagination);
         }
     }
 
-    async function loadAreaData() { if (Object.keys(areaData).length) return; const res = await fetch('/Korea_city_List.json'); areaData = await res.json(); renderSido(); }
+    // [추가] 페이지 번호 생성 함수
+    function renderPagination(pagination) {
+        const paginationEl = document.getElementById('pagination');
+        if (!paginationEl) return;
+
+        for (let i = 1; i <= pagination.last; i++) {
+            const pageLink = document.createElement('a');
+            pageLink.href = "javascript:void(0);";
+            pageLink.innerHTML = i;
+            pageLink.className = (i === pagination.current) ? 'on mx-1' : 'mx-1';
+            pageLink.onclick = () => pagination.gotoPage(i);
+            paginationEl.appendChild(pageLink);
+        }
+    }
+
+    // [추가] 모달 우측 상단 공통 컨트롤 버튼 (RESET, CLOSE)
+    function addModalControls(targetListId, type) {
+        const list = document.getElementById(targetListId);
+        const ctrlLi = document.createElement('li');
+        ctrlLi.className = "sticky top-0 z-20 bg-white p-2 flex gap-2 border-b mb-1";
+        const resetFn = type === 'area' ? 'resetRegionFilter()' : 'resetFoodFilter()';
+        ctrlLi.innerHTML = `
+            <button onclick="${resetFn}" class="flex-1 py-2 text-[11px] bg-gray-100 text-gray-500 rounded-lg font-black italic hover:bg-gray-200 transition-colors">RESET</button>
+            <button onclick="closeAll()" class="flex-1 py-2 text-[11px] bg-red-50 text-red-400 rounded-lg font-black italic hover:bg-red-100 transition-colors">CLOSE</button>
+        `;
+        list.appendChild(ctrlLi);
+    }
+
+    async function loadAreaData() {
+        if (Object.keys(areaData).length) return;
+        try {
+            const res = await fetch('/Korea_city_List.json');
+            areaData = await res.json(); renderSido();
+        } catch(e) { console.error("Area Load Error"); }
+    }
+
     function renderSido() {
         const list = document.getElementById('sidoList'); list.innerHTML = '';
+        addModalControls('sidoList', 'area');
         Object.keys(areaData).forEach(sido => {
             const li = document.createElement('li'); li.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold";
             li.innerText = sido;
@@ -354,27 +407,62 @@
             list.appendChild(li);
         });
     }
+
     function renderSigugun(sido) {
         const list = document.getElementById('sigugunList'); list.innerHTML = '';
+        const liAll = document.createElement('li');
+        liAll.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold text-blue-500";
+        liAll.innerText = "전체 (시/도)";
+        liAll.onclick = () => {
+            resetActive('sigugunList'); liAll.classList.add('active-item');
+            currentSelection.sigugun = "전체"; currentSelection.dong = null;
+            document.getElementById('display-area').innerText = sido;
+            closeAll(); updateSearch();
+        };
+        list.appendChild(liAll);
+
         Object.keys(areaData[sido]).forEach(sigu => {
-            const li = document.createElement('li'); li.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold";
+            const li = document.createElement('li');
+            li.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold";
             li.innerText = sigu;
             li.onclick = () => { resetActive('sigugunList'); li.classList.add('active-item'); currentSelection.sigugun = sigu; renderDong(sido, sigu); };
             list.appendChild(li);
         });
     }
+
     function renderDong(sido, sigu) {
         const list = document.getElementById('dongList'); list.innerHTML = '';
+        const liAll = document.createElement('li');
+        liAll.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold text-blue-500";
+        liAll.innerText = "전체 (시/구/군)";
+        liAll.onclick = () => {
+            resetActive('dongList'); liAll.classList.add('active-item');
+            currentSelection.dong = "전체";
+            document.getElementById('display-area').innerText = `${sido} ${sigu}`;
+            closeAll(); updateSearch();
+        };
+        list.appendChild(liAll);
+
         areaData[sido][sigu].forEach(dong => {
-            const li = document.createElement('li'); li.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold";
+            const li = document.createElement('li');
+            li.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold";
             li.innerText = dong;
             li.onclick = () => { currentSelection.dong = dong; document.getElementById('display-area').innerText = `${sido} ${sigu} ${dong}`; closeAll(); updateSearch(); };
             list.appendChild(li);
         });
     }
-    async function loadFoodData() { if (Object.keys(foodData).length) return; const res = await fetch('/Food_List.json'); foodData = await res.json(); renderFoodCategory(); }
+
+    async function loadFoodData() {
+        if (Object.keys(foodData).length) return;
+        try {
+            const res = await fetch('/Food_List.json');
+            foodData = await res.json(); renderFoodCategory();
+        } catch(e) { console.error("Food Load Error"); }
+    }
+
     function renderFoodCategory() {
         const list = document.getElementById('foodCategoryList'); list.innerHTML = '';
+        addModalControls('foodCategoryList', 'food');
         Object.keys(foodData).forEach(cat => {
             const li = document.createElement('li'); li.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold";
             li.innerText = cat;
@@ -382,8 +470,21 @@
             list.appendChild(li);
         });
     }
+
     function renderFoodNames(cat) {
         const list = document.getElementById('foodNameList'); list.innerHTML = '';
+        // [추가] 음식 카테고리 전체 버튼
+        const liAll = document.createElement('li');
+        liAll.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold text-blue-500";
+        liAll.innerText = `${cat} 전체`;
+        liAll.onclick = () => {
+            resetActive('foodNameList'); liAll.classList.add('active-item');
+            currentSelection.foodName = cat;
+            document.getElementById('display-food').innerText = `${cat} 전체`;
+            closeAll(); updateSearch();
+        };
+        list.appendChild(liAll);
+
         foodData[cat].forEach(food => {
             const li = document.createElement('li'); li.className = "p-3 cursor-pointer hover:bg-orange-50 rounded-lg font-bold";
             li.innerText = food.name;
@@ -392,23 +493,43 @@
         });
     }
 
+    function resetRegionFilter() {
+        currentSelection.sido = null; currentSelection.sigugun = null; currentSelection.dong = null;
+        document.getElementById('display-area').innerText = "📍 지역을 선택하세요";
+        document.getElementById('sigugunList').innerHTML = ''; document.getElementById('dongList').innerHTML = '';
+        closeAll(); updateSearch();
+    }
+
+    function resetFoodFilter() {
+        currentSelection.foodName = null;
+        document.getElementById('display-food').innerText = "🍴 음식 종류 선택";
+        document.getElementById('foodNameList').innerHTML = '';
+        closeAll(); updateSearch();
+    }
+
     function updateSearch() {
-        let keyword = "";
-        if (currentSelection.dong) keyword += `${currentSelection.sido} ${currentSelection.sigugun} ${currentSelection.dong} `;
+        let keyword = ""; let searchAddr = "";
+        if (currentSelection.sido) {
+            searchAddr = currentSelection.sido; keyword += currentSelection.sido + " ";
+            if (currentSelection.sigugun && currentSelection.sigugun !== "전체") {
+                searchAddr += " " + currentSelection.sigugun; keyword += currentSelection.sigugun + " ";
+                if (currentSelection.dong && currentSelection.dong !== "전체") {
+                    searchAddr += " " + currentSelection.dong; keyword += currentSelection.dong + " ";
+                }
+            }
+        }
         if (currentSelection.foodName) keyword += currentSelection.foodName + " ";
         const userKeyword = keywordInput.value.trim();
         if (userKeyword) keyword += userKeyword;
 
         if (!keyword.trim()) { ps.keywordSearch('맛집', renderPlaces); return; }
 
-        if (currentSelection.dong) {
-            geocoder.addressSearch(`${currentSelection.sido} ${currentSelection.sigugun} ${currentSelection.dong}`, (result, status) => {
-                if (status === kakao.maps.services.Status.OK) {
-                    map.setCenter(new kakao.maps.LatLng(result[0].y, result[0].x));
-                    ps.keywordSearch(keyword, renderPlaces);
-                }
-            });
-        } else { ps.keywordSearch(keyword, renderPlaces); }
+        geocoder.addressSearch(searchAddr || '서울', (result, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+                map.setCenter(new kakao.maps.LatLng(result[0].y, result[0].x));
+                ps.keywordSearch(keyword, renderPlaces);
+            } else { ps.keywordSearch(keyword, renderPlaces); }
+        });
     }
 
     function resetActive(id) {
@@ -419,5 +540,6 @@
     window.onload = () => { ps.keywordSearch('맛집', renderPlaces); };
     btnSearch.onclick = () => updateSearch();
     keywordInput.onkeypress = (e) => { if (e.key === 'Enter') updateSearch(); };
-</script> </body>
+</script>
+ </body>
 </html>

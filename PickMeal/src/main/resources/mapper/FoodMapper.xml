@@ -47,7 +47,9 @@
     </select>
 
     <select id="findImagePathByName" resultType="string">
-        SELECT imagePath FROM food WHERE foodName = #{foodName}
+        SELECT imagePath
+        FROM food
+        WHERE foodName = #{foodName}
     </select>
 
     <select id="findByName" resultMap="FoodResultMap">
@@ -66,4 +68,5 @@
         ORDER BY RAND()
         LIMIT 1
     </select>
+
 </mapper>

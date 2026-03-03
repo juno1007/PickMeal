@@ -56,7 +56,15 @@
         ORDER BY created_at DESC
     </select>
     <select id="getPopularRest" resultType="PickMeal.PickMeal.dto.RestaurantDTO">
-        SELECT r.res_id, r.res_name, r.address, r.lon, r.lat, r.region_name, r.representative_menu, r.menu_price, r.rest_views
+        SELECT
+            r.res_id AS restId,
+            r.res_name AS restName,
+            r.address AS restAddress,
+            r.lon AS restLng,
+            r.lat AS restLat,
+            r.representative_menu AS restMenu,
+            r.menu_price AS restPrice,
+            r.rest_views AS restViews
         FROM restaurant r
         JOIN (
             SELECT res_id, COUNT(*) AS wish_count
@@ -65,9 +73,8 @@
             GROUP BY res_id
             ORDER BY wish_count DESC
             LIMIT 10
-        ) rw ON r.res_id
+        ) rw ON r.res_id = rw.res_id
         ORDER BY rw.wish_count DESC
-        LIMIT 10
     </select>
 
 </mapper>

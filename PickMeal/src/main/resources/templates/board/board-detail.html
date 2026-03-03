@@ -191,11 +191,13 @@
           const form = document.createElement('form');
           form.method = 'post';
           form.action = `/board/remove/${encodeURIComponent(boardId)}`;
+
           const csrfToken = document.querySelector('meta[name="_csrf"]').content;
           const csrfInput = document.createElement('input');
           csrfInput.type = 'hidden';
           csrfInput.name = '_csrf';
           csrfInput.value = csrfToken;
+
           form.appendChild(csrfInput);
           document.body.appendChild(form);
           form.submit();
@@ -206,8 +208,10 @@
       if (!checkAuth()) return;
       const csrfToken = document.querySelector('meta[name="_csrf"]').content;
       const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
       const formData = new FormData();
       formData.append("like_type", likeType);
+
       fetch(`/board/reaction/${boardId}`, {
           method: "POST",
           headers: { [csrfHeader]: csrfToken },

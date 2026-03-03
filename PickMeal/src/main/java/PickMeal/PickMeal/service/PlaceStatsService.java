@@ -156,4 +156,28 @@ public class PlaceStatsService {
 
         return true;
     }
+
+    public List<PlaceStatsDto> getPopularPlace() {
+
+        String sql = "SELECT CAST(res_id AS CHAR) as kakaoPlaceId, " +
+                "MAX(place_name) as placeName, " +
+                "SUM(CASE WHEN is_wish = 1 THEN 1 ELSE 0 END) as heartCount, " +
+                "SUM(IFNULL(view_count, 0)) as viewCount, " +
+                "COUNT(content) as reviewCount, " +
+                "IFNULL(AVG(rating), 0) as avgRating " +
+                "FROM place_stats " +
+                "GROUP BY res_id " +
+                "ORDER BY heartCount DESC, viewCount DESC " +
+                "LIMIT 10";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            PlaceStatsDto dto = new PlaceStatsDto();
+            dto.setKakaoPlaceId(rs.getString("kakaoPlaceId"));
+            dto.setPlaceName(rs.getString("placeName"));
+            dto.setHeartCount(rs.getInt("heartCount"));
+            dto.setViewCount(rs.getInt("viewCount"));
+            dto.setReviewCount(rs.getInt("reviewCount"));
+            return dto;
+        });
+    }
 }
