@@ -72,6 +72,16 @@ public class GameService {
                     banList.addAll(java.util.Arrays.asList("냉면", "cucumber", "피클"));
                 }
 
+                // [신규] 면 처리 (추가된 부분!)
+                if (cleanedTag.contains("면")) {
+                    // "면"이라는 키워드를 선택했을 때, 실제 DB 음식 이름에 "면"이 없어도 필터링하고 싶은 메뉴들입니다.
+                    banList.addAll(java.util.Arrays.asList(
+                            "국수", "스파게티", "파스타", "우동", "소바", "라멘", "짬뽕", "짜장", "자장", "칼국수", "막국수"
+                    ));
+                    log.info("--- [면 필터 추가] 현재 금지어 명단: {}", banList);
+                }
+
+
                 // 4. 검사 시작
                 for (String banWord : banList) {
                     if (fFull.contains(banWord)) {
