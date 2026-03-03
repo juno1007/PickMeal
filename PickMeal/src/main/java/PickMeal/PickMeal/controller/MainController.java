@@ -121,19 +121,23 @@ public class MainController {
 
     @GetMapping("/game/play")
     public String playWorldCup(
-            @RequestParam(value = "types") List<String> types, // 'value'를 명시해주면 더 정확합니다.
+            @RequestParam(value = "types") List<String> types,
             @RequestParam(value = "round") int round,
+            @AuthenticationPrincipal User user,
             Model model) {
 
-        // 1. 서비스 일꾼에게 여러 종류(types)와 몇 강(round)인지 전달하며 재료를 가져오라고 시킵니다.
-        // (여기서 userService가 빨간 줄이면 위에서 @Autowired로 선언했는지 꼭 확인하세요!)
+        // 1. 서비스 일꾼에게 전체 음식 재료를 가져오라고 시킵니다.
         List<Food> foods = userService.getMixedFoods(types, round);
+        Long userId = (user != null) ? user.getUser_id() : null;
 
-        // 2. 주방장이 준비한 재료들을 게임판(HTML)으로 전달합니다.
-        model.addAttribute("foods", foods);
+        // 🌟 [핵심 수정] 메서드 이름을 GameService에서 만든 것과 똑같이 맞춰줍니다.
+        // getFilteredFoodList -> getPriorityFoodList
+        List<Food> filteredFoods = gameService.getPriorityFoodList(userId, foods, round);
+
+        // 2. 주방장이 선호 음식을 포함해 정성껏 준비한 'filteredFoods'를 게임판으로 전달합니다.
+        model.addAttribute("foods", filteredFoods);
         model.addAttribute("totalRound", round);
 
-        // 3. 실제 대결이 펼쳐질 'worldcup.html'로 이동합니다.
         return "game/worldcup";
     }
 

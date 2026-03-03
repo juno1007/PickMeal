@@ -54,4 +54,8 @@ public interface UserMapper {
      * 아이디, 이메일로 일치하는 회원 확인 (비밀번호 찾기 전 본인 인증용)
      */
     User findUserByIdAndEmail(@Param("id") String id, @Param("email") String email);
+
+    String getLikedMenuString(Long userId);    // 선호 음식 가져오기
+
+    String getDislikedMenuString(Long userId); // 비선호 음식 가져오기
 }

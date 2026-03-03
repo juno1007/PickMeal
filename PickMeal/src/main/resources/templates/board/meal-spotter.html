@@ -6,6 +6,7 @@
     <title>Pick Meal - Meal Spotter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=24546b16104e0273c6d8c5c4cc508b44&libraries=services"></script>
     <style>
         body { font-family: 'Fredoka', sans-serif; background-color: #fff; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
         header, header *, .italic-text { font-style: italic !important; }
@@ -115,6 +116,21 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </button>
+                </div>
+
+                <p class="text-[12px] ..." th:text="${res.restAddress}">식당 주소</p>
+
+                <p class="text-[12px] ..." th:text="|대표메뉴 : ${res.restMenu}|">대표메뉴</p>
+
+                <div class="flex items-center gap-3">
+                    <span class="...">👁️ [[${res.restViews}]]</span>
+
+                    <span class="..." th:onclick="showReviewList([[${res.restId}]], [[${res.restName}]])">
+            📝 <span th:id="'review-count-' + ${res.restId}"
+                    th:text="${res.reviewCount}">0</span>
+        </span>
+
+                    <button class="..." th:onclick="'openReviewModal(event, ' + ${res.restId} + ')'">EVALUATION</button>
                 </div>
             </div>
         </div>
