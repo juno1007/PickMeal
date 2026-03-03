@@ -129,6 +129,17 @@ public class RestaurantController {
 
     }
 
+    // RestaurantController.java
+
+    // 리뷰 삭제를 처리하는 창구 (DELETE 방식)
+    @DeleteMapping("/api/review/delete/{reviewId}")
+    @ResponseBody
+    public String deleteReview(@PathVariable Long reviewId) {
+        // 1. 서비스나 매퍼를 통해 DB에서 해당 리뷰 번호를 삭제합니다.
+        reviewWishMapper.deleteReview(reviewId);
+        return "success";
+    }
+
     @GetMapping("/restaurant/detail/{restId}")
     public String getRestaurantDetail(@PathVariable Long restId){
 

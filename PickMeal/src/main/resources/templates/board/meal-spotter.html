@@ -189,30 +189,40 @@
 
 // 리뷰 목록 가져오기
     function showReviewList(restId, restName) {
-        fetch(`/api/reviews/${restId}`)
-            .then(res => {
-                if (!res.ok) throw new Error('Network response was not ok');
-            return res.json();
-            })
-            .then(data => {
-                const container = document.getElementById('reviewListContainer');
-                document.getElementById('modalRestName').innerText = restName + " 리뷰 📝";
-                container.innerHTML = "";
+    fetch(`/api/reviews/${restId}`)
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('reviewListContainer');
+            document.getElementById('modalRestName').innerText = restName + " 리뷰 📝";
+            container.innerHTML = "";
 
-                if (data.length === 0) {
-                    container.innerHTML = "<p class='text-center py-5'>아직 리뷰가 없습니다. 😊</p>";
-                } else {
-                    data.forEach(review => {
-                        const item = `
-                            <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
-                                <strong>👤 ${review.userId}</strong> <span style="color:#ff9f43">⭐ ${review.rating}</span>
-                                <p>${review.content}</p>
-                                <small style="color:#999">${review.createdAt}</small>
-                            </div>`;
-                        container.innerHTML += item;
-                    });
-                }
-                document.getElementById('reviewListModal').style.display = "flex";
+            if (data.length === 0) {
+                container.innerHTML = "<p class='text-center py-5'>아직 리뷰가 없습니다. 😊</p>";
+            } else {
+                data.forEach(review => {
+              // [중요] review.reviewId 값이 비어있지 않은지 확인하세요!
+              // 만약 에러가 난다면 review.id 혹은 review.resId 등으로 이름을 바꿔보세요.
+             const rId = review.reviewId;
+
+    const item = `
+        <div style="border-bottom: 1px solid #eee; padding: 15px 0; position: relative;">
+            <strong>👤 ${review.userId}</strong>
+            <span style="color:#ff9f43">⭐ ${review.rating}</span>
+
+            <div style="position: absolute; right: 0; top: 10px;">
+                <button onclick="editReview(${rId}, '${review.content}', ${review.rating})"
+                        style="font-size: 11px; color: #4A90E2; margin-right: 5px;">수정</button>
+                <button onclick="deleteReview(${rId})"
+                        style="font-size: 11px; color: #FF5A5F;">삭제</button>
+            </div>
+
+            <p style="margin-top: 5px;">${review.content}</p>
+            <small style="color:#999">${review.createdAt}</small>
+        </div>`;
+    container.innerHTML += item;
+                });
+            }
+            document.getElementById('reviewListModal').style.display = "flex";
             })
             .catch(err => {
         // [추가] 통신 중 에러가 발생하면 콘솔창에 빨간색으로 표시해줍니다.
@@ -220,19 +230,47 @@
     });
     }
 
+    // [추가] 삭제 함수: 지우개 기능을 서버에 요청함
+function deleteReview(reviewId) {
+    console.log("삭제하려는 리뷰 번호:", reviewId); // [확인용] 여기에 undefined가 뜨면 안 됩니다!
+
+    if (!reviewId || reviewId === "undefined") {
+        alert("리뷰 번호를 찾을 수 없습니다.");
+        return;
+    }
+
+    if (confirm("정말로 이 리뷰를 삭제하시겠습니까? 🗑️")) {
+        fetch(`/api/review/delete/${reviewId}`, { method: 'DELETE' })
+            .then(res => {
+                if (res.ok) {
+                    alert("삭제되었습니다! ✨");
+                    location.reload();
+                }
+            });
+    }
+}
+let isEditMode = false;
+
+// [추가] 수정 함수: 작성창을 다시 띄워 연필로 고치는 기능
+function editReview(reviewId, content, rating) {
+    isEditMode = true; // 스위치를 '수정'으로!
+    document.getElementById('targetRestId').value = reviewId; // 리뷰 번호를 담음
+    document.getElementById('reviewContent').value = content;
+    document.getElementById('reviewRating').value = rating;
+    document.getElementById('reviewModal').classList.remove('hidden');
+}
+
     function closeReviewListModal() {
         document.getElementById('reviewListModal').style.display = "none";
     }
 
-    // [추가] 1. 리뷰 작성창 열기 함수
+    // [2] 기존 함수 교체: 신규 등록용
     function openReviewModal(event, restId) {
-    // 식당 리스트 자체를 클릭하는 이벤트와 겹치지 않게 방지합니다.
     event.stopPropagation();
-
-    // 어느 식당에 리뷰를 쓰는지 번호(ID)를 숨겨진 입력창에 저장합니다.
+    isEditMode = false; // 스위치를 '등록'으로!
     document.getElementById('targetRestId').value = restId;
-
-    // 숨겨져 있던 리뷰 작성 모달창(reviewModal)을 화면에 보이게 합니다.
+    document.getElementById('reviewContent').value = ""; // 입력창 비우기
+    document.getElementById('reviewRating').value = "5";
     document.getElementById('reviewModal').classList.remove('hidden');
 }
 
@@ -242,27 +280,38 @@
     document.getElementById('reviewContent').value = ""; // 입력했던 내용을 지웁니다.
 }
 
-    // 리뷰 저장
-    function submitReview() {
-        const resId = document.getElementById('targetRestId').value;
-        const data = {
-            resId: resId,
-            rating: document.getElementById('reviewRating').value,
-            content: document.getElementById('reviewContent').value
-        };
+    // [4] 기존 submitReview 함수를 이 내용으로 덮어쓰기
+function submitReview() {
+    const id = document.getElementById('targetRestId').value;
+    const rating = document.getElementById('reviewRating').value;
+    const content = document.getElementById('reviewContent').value;
 
-        fetch('/api/review/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        }).then(response => {
-            if (response.ok) {
-                alert("리뷰가 등록되었습니다! 📝");
-                closeReviewModal();
-                location.reload(); // 숫자 업데이트를 위해 새로고침
-            }
-        });
+    const data = { rating: rating, content: content };
+    let url = "";
+
+    // 스위치 상태에 따라 배달 주소와 담는 물건을 다르게 정함
+    if (isEditMode) {
+        data.reviewId = id; // 수정일 땐 리뷰 번호
+        url = '/api/review/update';
+    } else {
+        data.resId = id;    // 등록일 땐 식당 번호
+        url = '/api/review/save';
     }
+
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    }).then(response => {
+        if (response.ok) {
+            alert("리뷰가 성공적으로 처리되었습니다! ✨");
+            location.reload();
+        } else {
+            alert("처리에 실패했습니다. 로그인 상태를 확인해주세요.");
+        }
+    });
+}
+
 </script>
 
 <footer th:replace="~{fragments/footer :: footerFragment}"></footer>
