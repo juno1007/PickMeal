@@ -25,7 +25,8 @@
 
         <th:block th:if="${#authorization.expression('hasRole(''ROLE_USER'')') or #authorization.expression('hasRole(''ROLE_ADMIN'')')}">
 
-            <a th:href="@{/users/mypage}"
+            <a sec:authorize="hasRole('USER')"
+               th:href="@{/users/mypage}"
                class="nav-link text-gray-800 hover:text-[#FF8A5B] transition font-black whitespace-nowrap uppercase">
                 MY PAGE
             </a>
