@@ -127,15 +127,31 @@ public class UserController {
     }
 
     @GetMapping("/signup/social")
-    public String socialSignupForm(@RequestParam String socialId, @RequestParam String email, @RequestParam String site,  @RequestParam(value = "name", required = false) String name, Model model) {
-        User socialUser = new User(); // 소셜 전용 유저 객체 생성
+    public String socialSignupForm(
+            @RequestParam("socialId") String socialId,
+            @RequestParam("email") String email,
+            @RequestParam("site") String site,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "nickname", required = false) String nickname, // nickname 추가
+            Model model) {
+
+        User socialUser = new User();
         socialUser.setSocialId(socialId);
         socialUser.setSocialLoginSite(site);
-        socialUser.setNickname(name);
+
+        // 네이버나 카카오는 nickname으로 올 확률이 높으므로 방어 로직 추가
+        String finalNickname = (nickname != null && !nickname.isEmpty()) ? nickname : name;
+        socialUser.setNickname(finalNickname);
+
         socialUser.setEmail(email);
-        socialUser.setId(site + "_" + socialId); // 예: google_12345
-        model.addAttribute("user", socialUser); // 폼에 미리 채워진 데이터 전달
-        model.addAttribute("isSocial", true); // 프론트에서 소셜 유저임을 판별
+        socialUser.setName(name); // 이름 필드도 있다면 채워줌
+
+        // CustomOAuth2UserService에서 만든 규칙과 동일하게 ID 세팅
+        socialUser.setId(site + "_" + socialId);
+
+        model.addAttribute("user", socialUser);
+        model.addAttribute("isSocial", true);
+
         return "users/signup";
     }
 

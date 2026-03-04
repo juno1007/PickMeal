@@ -110,6 +110,7 @@
     let idx = 0; let playing = false;
     const sphere = document.getElementById('sphere');
 
+    // 초기 캡슐 생성
     function initCapsules() {
         sphere.innerHTML = '';
         for(let i=0; i<18; i++) {
@@ -165,6 +166,7 @@
                     outPos.appendChild(outCap);
 
                     setTimeout(() => {
+                        // 연출 시작
                         document.getElementById('result-top-cap').style.backgroundColor = 'rgba(255, 255, 255, 0.6)';
                         document.getElementById('result-bottom-cap').style.backgroundColor = winColor;
                         showCapsuleAnimation(data);
@@ -178,14 +180,20 @@
         }
     }
 
+    // [수정] 캡슐이 벌어지는 애니메이션과 결과창 통합
     function showCapsuleAnimation(data) {
         document.getElementById('machine-all').style.opacity = '0';
+
         setTimeout(() => {
             document.getElementById('machine-all').style.display = 'none';
             const rs = document.getElementById('result-screen');
             rs.style.display = 'flex';
+
             setTimeout(() => {
+                // 1. 캡슐 껍데기가 위아래로 벌어짐
                 rs.classList.add('is-open');
+
+                // 2. [타이밍 핵심] 벌어지는 즉시(0.6초 뒤) 바로 카드와 폭죽 등장!
                 setTimeout(() => {
                     showFinalCHAMPION(data);
                 }, 600);
@@ -193,32 +201,42 @@
         }, 400);
     }
 
+    // [수정] 최종 월드컵 스타일 결과창 및 풍성한 폭죽 연출
     function showFinalCHAMPION(winner) {
-        const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+    // 1. 헤더에서 CSRF 토큰과 헤더 이름 가져오기
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
 
-        if (winner.foodId && csrfHeader && csrfToken) {
-            fetch('/worldcup/win/' + winner.foodId + '?gameType=capsule', {
-                method: 'POST',
-                headers: { [csrfHeader]: csrfToken }
-            })
-            .then(res => res.text())
-            .then(data => console.log("저장 결과:", data))
-            .catch(e => console.error("에러 발생:", e));
-        }
-
+    if (winner.foodId) {
+        fetch('/worldcup/win/' + winner.foodId + '?gameType=capsule', {
+            method: 'POST',
+            headers: {
+                // [중요] 시큐리티 인증을 위해 CSRF 토큰을 반드시 실어줍니다.
+                [csrfHeader]: csrfToken
+            }
+        })
+        .then(res => res.text())
+        .then(data => console.log("저장 결과:", data))
+        .catch(e => console.error("에러 발생:", e));
+    }
         const rs = document.getElementById('result-screen');
         rs.style.display = 'none';
+
         const main = document.getElementById('game-main');
-        main.className = "gacha-main-content";
+        main.classList.add('flex-col', 'items-center', 'pt-[60px]', 'pb-10');
+
+        // 폭죽 효과 강화 (좌우 동시 발사)
+        const defaults = { startVelocity: 45, spread: 360, ticks: 100, zIndex: 9999, particleCount: 150 };
+        confetti({ ...defaults, origin: { x: 0.2, y: 0.6 } });
+        confetti({ ...defaults, origin: { x: 0.8, y: 0.6 } });
 
         main.innerHTML = `
-           <div class="pt-10 w-full"></div> <div class="flex flex-col items-center justify-center w-full animate-bounce mb-2">
-            <h2 class="text-[#FF8A5B] font-black text-5xl uppercase italic tracking-tighter">WINNER</h2>
+            <div class="flex flex-col items-center justify-center w-full animate-bounce mb-2">
+                <h2 class="text-[#FF8A5B] font-black text-5xl uppercase italic tracking-tighter">WINNER</h2>
             </div>
-            <div class="bg-white winner-card-mid shadow-2xl text-center">
-                <div class="winner-img-mid mb-6 bg-gray-50">
-                    <img src="${winner.imagePath}" class="w-full h-full object-contain p-4" onerror="this.src='/images/meal.png'">
+            <div class="bg-white winner-card-mid shadow-2xl border-4 border-[#FF8A5B] w-[90%] sm:w-full text-center">
+                <div class="winner-img-mid mb-6 shadow-md">
+                    <img src="${winner.imagePath}" class="w-full h-full object-cover" onerror="this.src='/images/meal.png'">
                 </div>
                 <h1 class="text-4xl font-black text-gray-800 italic mb-6 uppercase tracking-tighter">${winner.foodName}</h1>
                 <div class="grid grid-cols-2 gap-3 mb-4">
@@ -233,7 +251,6 @@
                 </button>
             </div>
         `;
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, zIndex: 9999 });
     }
 
     window.copyToClipboard = function(foodName) {

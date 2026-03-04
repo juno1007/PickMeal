@@ -19,8 +19,32 @@
     .btn-check:hover { background-color: #E67A4D; transform: translateY(-1px); }
     .strength-meter { height: 6px; width: 100%; background-color: #F3F4F6; border-radius: 3px; margin-top: 8px; overflow: hidden; }
     .strength-bar { height: 100%; width: 0%; transition: all 0.5s ease; }
-    .timer-badge { display: none; background: #FFF5F0; color: #FF8A5B; padding: 4px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 800; border: 2px solid #FF8A5B; animation: pulse 2s infinite; }
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+    /* 타이머 배지 스타일 */
+    .timer-badge { display: none; background: #FFF5F0; color: #FF8A5B; padding: 6px 14px; border-radius: 1.2rem; font-size: 0.85rem; font-weight: 800; border: 2px solid #FF8A5B; }
+
+    /* [신규] 인증 완료 배지 스타일 */
+    .verified-badge {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background-color: #ECFDF5;
+      color: #10B981;
+      padding: 6px 14px;
+      border-radius: 1.2rem;
+      font-size: 0.8rem;
+      font-weight: 900;
+      border: 2px solid #10B981;
+      font-style: italic;
+      text-transform: uppercase;
+      animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
     .phone-group { display: flex; align-items: center; gap: 0.5rem; }
     .phone-input { text-align: center; padding: 0.75rem 0.5rem !important; }
     .pw-wrapper { position: relative; width: 100%; }
@@ -81,6 +105,10 @@
             <input type="text" id="emailAuthCode" placeholder="인증번호" class="input-field text-sm">
             <button type="button" id="btnVerifyMail" onclick="verifyEmailCode()" class="btn-check text-xs uppercase bg-gray-400">인증</button>
             <span id="timer" class="timer-badge">05:00</span>
+            <span id="verifiedMark" class="verified-badge">
+              <i data-lucide="check-circle" style="width:16px; height:16px;"></i>
+              Verified
+            </span>
           </div>
         </div>
         <div class="phone-group">
@@ -139,7 +167,6 @@
       lucide.createIcons();
   }
 
-  // 실시간 아이디 유효성 체크
   if(idInput && !idInput.readOnly) {
       idInput.addEventListener('input', () => {
           const status = document.getElementById('idStatus');
@@ -153,7 +180,6 @@
       });
   }
 
-  // 실시간 비밀번호 강도 체크 (수정됨)
   if(pwInput) {
       pwInput.addEventListener('input', () => {
           const val = pwInput.value;
@@ -176,7 +202,6 @@
       });
   }
 
-  // 실시간 닉네임 상태 체크
   nickInput.addEventListener('input', () => {
       const status = document.getElementById('nicknameStatus');
       if(nickInput.value !== lastCheckedNickname) {
@@ -186,7 +211,6 @@
       }
   });
 
-  // 전화번호 처리
   const p2 = document.getElementById('phone2'), p3 = document.getElementById('phone3');
   [p2, p3].forEach((input, index) => {
       input.addEventListener('input', () => {
@@ -218,11 +242,19 @@
   function startTimer() {
       let timeLeft = 300;
       const display = document.getElementById('timer');
+      const vMark = document.getElementById('verifiedMark');
+
       display.style.display = 'inline-block';
+      vMark.style.display = 'none'; // 타이머 시작 시 인증마크 숨김
+
       if(timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(() => {
           display.innerText = `${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')}`;
-          if(--timeLeft < 0) { clearInterval(timerInterval); display.innerText = "만료"; display.style.color = "red"; }
+          if(--timeLeft < 0) {
+            clearInterval(timerInterval);
+            display.innerText = "만료";
+            display.style.color = "red";
+          }
       }, 1000);
   }
 
@@ -247,9 +279,27 @@
       if(!code) return alert("인증번호를 입력해주세요.");
       const response = await fetch('/mail/verify', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `code=${code}` });
       const resText = await response.text();
+
       if(resText === "success") {
-          alert("인증 완료! ✅"); isEmailVerified = true; clearInterval(timerInterval);
-          document.getElementById('timer').innerText = "인증 완료"; document.getElementById('timer').style.color = "green";
+          alert("인증 완료! ✅");
+          isEmailVerified = true;
+          clearInterval(timerInterval);
+
+          const timer = document.getElementById('timer');
+          const vMark = document.getElementById('verifiedMark');
+          const verifyBtn = document.getElementById('btnVerifyMail');
+          const authInput = document.getElementById('emailAuthCode');
+
+          timer.style.display = 'none';
+          vMark.style.display = 'flex'; // 배지 표시
+
+          authInput.readOnly = true;
+          authInput.style.backgroundColor = '#F9FAFB';
+          verifyBtn.disabled = true;
+          verifyBtn.style.opacity = '0.5';
+          verifyBtn.innerText = "DONE";
+
+          lucide.createIcons();
       } else if(resText === "timeout") alert("시간이 초과되었습니다.");
       else alert("인증번호 불일치.");
   }

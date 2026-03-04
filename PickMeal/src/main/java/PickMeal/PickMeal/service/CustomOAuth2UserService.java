@@ -29,40 +29,52 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         Map<String, Object> originAttributes = oAuth2User.getAttributes();
 
-        // 1. 원본에서 ID 추출
         String rawId = "";
+        String email = "";
+        String nickname = "";
+
+        // 1. 제공자별 데이터 추출 (ID, Email, Nickname)
         if ("naver".equals(registrationId)) {
             Map<String, Object> response = (Map<String, Object>) originAttributes.get("response");
             rawId = String.valueOf(response.get("id"));
+            email = String.valueOf(response.get("email"));
+            nickname = String.valueOf(response.get("nickname"));
         } else if ("kakao".equals(registrationId)) {
             rawId = String.valueOf(originAttributes.get("id"));
-        } else {
+            Map<String, Object> kakaoAccount = (Map<String, Object>) originAttributes.get("kakao_account");
+            if (kakaoAccount != null) {
+                email = String.valueOf(kakaoAccount.get("email"));
+                Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
+                if (profile != null) {
+                    nickname = String.valueOf(profile.get("nickname"));
+                }
+            }
+        } else if ("google".equals(registrationId)) {
             rawId = String.valueOf(originAttributes.get("sub"));
+            email = String.valueOf(originAttributes.get("email"));
+            nickname = String.valueOf(originAttributes.get("name")); // 구글은 보통 name을 사용
         }
 
-        // 2. [필살기] 혹시라도 이미 붙어있을지 모르는 모든 접두사 제거 (중복 방지)
-        // "kakao_kakao_4746" -> "4746" 으로 강제 세척
+        // 2. ID 세척 및 접두사 부여 로직 (기존 로직 유지)
         String cleanId = rawId.replace(registrationId + "_", "").replace(registrationId, "");
-
-        // 3. 딱 한 번만 깔끔하게 붙임 -> "kakao_4746951582"
         String finalId = registrationId + "_" + cleanId;
 
-        System.out.println(">>> [최종 확정 ID] : " + finalId);
-
-        // 4. 탈퇴 체크
+        // 3. 탈퇴 체크 (기존 로직 유지)
         User user = userMapper.findById(finalId);
         if (user != null && "WITHDRAWN".equals(user.getStatus())) {
             throw new OAuth2AuthenticationException(new OAuth2Error("withdrawn_user"), "탈퇴 회원");
         }
 
-        // 5. 세션 설정 (db_id라는 키로 저장)
-        Map<String, Object> customMap = new java.util.HashMap<>(originAttributes);
+        // 4. 세션 설정을 위한 Map 구성 (email과 nickname 추가)
+        Map<String, Object> customMap = new HashMap<>(originAttributes);
         customMap.put("db_id", finalId);
+        customMap.put("email", email);
+        customMap.put("nickname", nickname);
 
         return new DefaultOAuth2User(
-                Collections.singleton(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_USER")),
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
                 customMap,
-                "db_id" // 식별자 키 고정
+                "db_id"
         );
     }
 }

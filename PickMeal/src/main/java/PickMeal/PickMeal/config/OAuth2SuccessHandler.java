@@ -34,32 +34,28 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String registrationId = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
 
-        // [핵심 수정] 서비스에서 이미 완벽하게 만들어둔 ID를 그대로 가져옵니다.
-        // 더 이상 registrationId + "_" 같은 짓을 하지 않습니다.
+        // 1. 서비스에서 이미 정제해서 넣어준 데이터들을 꺼냅니다.
         String userId = (String) oAuth2User.getAttributes().get("db_id");
+        String email = (String) oAuth2User.getAttributes().get("email");       // 추가됨
+        String nickname = (String) oAuth2User.getAttributes().get("nickname"); // 추가됨
 
-        // 만약 db_id가 없으면 기본 name이라도 씁니다.
         if (userId == null) userId = oAuth2User.getName();
-
-        System.out.println(">>> [핸들러 최종 검증] DB 조회할 ID: " + userId);
 
         User findUser = userService.findById(userId);
 
         if (findUser != null) {
-            // 기존 회원: 메인으로 이동
             getRedirectStrategy().sendRedirect(request, response, "/next-page");
         } else {
-            // 신규 회원: 가입 페이지로 이동 (기존 파라미터 로직 유지)
-            // socialId 추출 시 이미 붙어있는 접두사를 제거해서 보냅니다 (가입폼 깔끔하게)
+            // 2. 신규 회원: 가입 페이지로 이동
             String pureSocialId = userId.replace(registrationId + "_", "");
 
-            Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttribute("kakao_account");
-            String email = (kakaoAccount != null) ? (String) kakaoAccount.get("email") : "";
-
+            // [중요 수정] 이제 제공자마다 다르게 꺼내던 복잡한 로직 대신,
+            // 서비스에서 담아준 정제된 변수들을 그대로 queryParam에 넣습니다.
             String targetUrl = UriComponentsBuilder.fromUriString("/users/signup/social")
                     .queryParam("socialId", pureSocialId)
-                    .queryParam("email", email)
+                    .queryParam("email", (email != null) ? email : "")
                     .queryParam("site", registrationId)
+                    .queryParam("name", (nickname != null) ? nickname : "") // 컨트롤러가 name으로 받고 있으니 name으로 전달
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString();
