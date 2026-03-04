@@ -98,26 +98,28 @@
         </div>
     </div>
 
+
+
     <div class="swiper-container-wrapper">
         <div class="swiper mySwiper">
             <div class="swiper-wrapper" id="menuWrapper">
                 <div class="swiper-slide p-2" th:each="hotSpot : ${hotSpotList}">
 
                     <div class="food-card bg-white overflow-hidden shadow-lg border-2 border-gray-50 p-6">
-                        <!-- th:onclick="|location.href='@{/restaurant/detail/{restId}(restId=${rest.restId})}'|" -->
-
-                        <div class="bg-[#FFF5F0] h-56 rounded-[2.5rem] mb-5 flex flex-col items-center justify-center select-none transition hover:bg-[#FF8A5B] hover:text-white group" style="background">
-                            <div class="text-5xl mb-2 group-hover:scale-125 transition">❤️</div>
-                            <div class="text-[#FF8A5B] text-2xl font-black group-hover:text-white"
-                                 th:text="${hotSpot.wishCount} + ' Pick!'">5 Pick!</div>
+                        <div class="h-56 rounded-[2.5rem] mb-5 flex flex-col items-center justify-center select-none transition group relative bg-cover bg-center"
+                             th:style="|background-image: url('/images/food_placeholder.png')|">
                         </div>
-
 
                         <div class="px-4 text-center">
                             <h3 class="text-xl font-black text-gray-800 italic uppercase truncate"
                                 th:text="${hotSpot.placeName}">식당 이름</h3>
 
-                            <p class="text-gray-500 mt-2 font-bold text-lg" th:text="${hotSpot.category}">카테고리</p>
+                            <p class="text-gray-500 mt-2 font-bold text-lg mb-4" th:text="${hotSpot.category}">카테고리</p>
+
+                            <div class="flex justify-center items-center gap-2 transition group-hover:scale-110 drop-shadow-md">
+                                <span class="text-4xl drop-shadow-lg">❤️</span>
+                                <span class="text-[#FF8A5B] text-2xl font-black" th:text="${hotSpot.wishCount} + ' Pick!'">5 Pick!</span>
+                            </div>
 
                             <div class="flex justify-between items-center mt-6">
                                 <div class="flex gap-3 text-[13px] font-bold text-gray-500 italic items-center">
