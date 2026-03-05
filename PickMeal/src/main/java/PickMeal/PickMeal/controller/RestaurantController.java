@@ -1,40 +1,33 @@
 package PickMeal.PickMeal.controller;
 
+import PickMeal.PickMeal.domain.HotSpot;
 import PickMeal.PickMeal.dto.PlaceStatsDto;
 import PickMeal.PickMeal.dto.ReviewWishDTO;
 import PickMeal.PickMeal.mapper.RestaurantMapper;
 import PickMeal.PickMeal.mapper.ReviewWishMapper;
+import PickMeal.PickMeal.service.HotSpotService;
 import PickMeal.PickMeal.service.PlaceStatsService;
 import PickMeal.PickMeal.service.RestaurantService;
 import PickMeal.PickMeal.service.ReviewService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor // [수정] 직접 작성했던 생성자를 지우고, 이 어노테이션으로 스프링 빈 자동 주입을 처리합니다.
 public class RestaurantController {
 
     private final RestaurantMapper restaurantMapper;
     private final ReviewWishMapper reviewWishMapper;
     private final RestaurantService restaurantService;
     private final ReviewService reviewService;
-    private final PlaceStatsService placeStatsService; // [추가] 서비스 필드
-
-    // [수정] 생성자에서 placeStatsService를 반드시 초기화해야 합니다.
-    public RestaurantController(RestaurantMapper restaurantMapper,
-                                ReviewWishMapper reviewWishMapper,
-                                RestaurantService restaurantService,
-                                ReviewService reviewService,
-                                PlaceStatsService placeStatsService) {
-        this.restaurantMapper = restaurantMapper;
-        this.reviewWishMapper = reviewWishMapper;
-        this.restaurantService = restaurantService;
-        this.reviewService = reviewService;
-        this.placeStatsService = placeStatsService;
-    }
+    private final PlaceStatsService placeStatsService;
+    private final HotSpotService hotSpotService; // [추가] @RequiredArgsConstructor 덕분에 자동으로 주입됩니다.
 
     // 로그인 유저의 문자열 ID(예: woals106)를 가져오는 메서드
     private String getLoginUserId(Authentication authentication) {
@@ -43,24 +36,45 @@ public class RestaurantController {
     }
 
     // 1. 맛집 탐지기 페이지 접속
+    // 1. 맛집 탐지기 페이지 접속
     @GetMapping("/meal-spotter")
     public String mealSpotter(Model model, Authentication authentication) {
-
-        List<PlaceStatsDto> popularPlaceList = placeStatsService.getPopularPlace();
-
         String userId = getLoginUserId(authentication);
 
-        if (userId != null && popularPlaceList != null) {
-            for (PlaceStatsDto dto : popularPlaceList) {
-                Long resId = Long.parseLong(dto.getKakaoPlaceId());
+        // 1. DB의 hot_spot 테이블에서 핫스팟 목록 가져오기
+        List<HotSpot> hotSpotList = hotSpotService.getHotSpotList();
+        List<PlaceStatsDto> popularPlaceList = new ArrayList<>();
 
-                // [중요] userId가 문자열이므로 Long.valueOf를 제거했습니다.
-                // 매퍼(checkWish)의 파라미터 타입이 String/Varchar 인지 확인하세요.
-                int check = reviewWishMapper.checkWish(userId, resId);
-                dto.setLiked(check > 0);
+        // [핵심] 이 줄이 빠져서 빨간 줄이 떴던 겁니다! 중복 검사용 바구니(Set) 생성
+        java.util.Set<Long> uniqueResIds = new java.util.HashSet<>();
+
+        // 2. 각 핫스팟의 상세 통계 정보 불러오기
+        for (HotSpot hs : hotSpotList) {
+            Long resId = hs.getResId();
+
+            // 3. 중복 검사: 이미 바구니에 있는 resId면 이번 턴은 건너뜀
+            if (uniqueResIds.contains(resId)) {
+                continue;
+            }
+            // 처음 보는 resId면 바구니에 담아서 기록해둠
+            uniqueResIds.add(resId);
+
+            // 통계 정보 가져오기
+            PlaceStatsDto dto = placeStatsService.getPlaceStatByKakaoIds(String.valueOf(resId));
+
+            if (dto != null) {
+                if (userId != null) {
+                    // 유저가 로그인한 상태라면 찜(좋아요) 여부 체크
+                    int check = reviewWishMapper.checkWish(userId, resId);
+                    dto.setLiked(check > 0);
+                }
+                popularPlaceList.add(dto);
             }
         }
 
+        popularPlaceList.sort((a, b) -> Integer.compare(b.getHeartCount(), a.getHeartCount()));
+
+        // 중복이 제거된 핫스팟 데이터를 화면으로 전달
         model.addAttribute("popularPlaceList", popularPlaceList);
         return "board/meal-spotter";
     }
@@ -78,8 +92,6 @@ public class RestaurantController {
         // 1. 리뷰 저장 실행
         reviewService.save(dto);
 
-        // 2. [수정] dto.getResId()가 String일 경우를 대비해 타입을 체크합니다.
-        // 만약 getReviewCount가 Long을 받는다면 Long.parseLong을 써야 합니다.
         try {
             // String인 resId를 숫자로 변환하여 매퍼에 전달
             Long resIdLong = Long.parseLong(dto.getResId());
@@ -98,7 +110,7 @@ public class RestaurantController {
 
         if (userId == null) return "fail";
 
-        // [수정] 문자열 ID를 그대로 사용하여 찜 상태 확인
+        // 문자열 ID를 그대로 사용하여 찜 상태 확인
         int alreadyWished = reviewWishMapper.checkWish(userId, resId);
 
         if (alreadyWished > 0) {

@@ -195,6 +195,7 @@
     let filteredPlaces = []; // 하트 10개 이상인 장소들만 담을 배열
 let currentPage = 1;
 const pageSize = 15;
+let allPlaces = [];
     const currentLoginUser = /*[[${#authentication.name}]]*/ 'guest';
     const keywordInput = document.getElementById('keywordInput');
     const btnSearch = document.getElementById('btnSearch');
@@ -609,9 +610,81 @@ function renderCustomPagination() {
         if (list) Array.from(list.children).forEach(li => li.classList.remove('active-item'));
     }
 
-    window.onload = () => { ps.keywordSearch('맛집', renderPlaces); };
-    btnSearch.onclick = () => updateSearch();
-    keywordInput.onkeypress = (e) => { if (e.key === 'Enter') updateSearch(); };
+    window.onload = async () => {
+        // 백엔드에서 보내준 핫스팟(하트 10개 이상) 데이터
+        const dbHotSpots = /*[[${popularPlaceList}]]*/ [];
+
+        // 카카오 API 호출 제한을 방지하기 위해 순차적으로 주소 -> 좌표(x, y) 변환
+        for (const spot of dbHotSpots) {
+            await new Promise(resolve => {
+                geocoder.addressSearch(spot.address, (result, status) => {
+                    if (status === kakao.maps.services.Status.OK) {
+                        // 기존 프론트 코드 포맷에 맞추어 객체 재가공
+                        spot.x = result[0].x;
+                        spot.y = result[0].y;
+                        spot.pos = new kakao.maps.LatLng(spot.y, spot.x);
+                        spot.id = spot.kakaoPlaceId;
+                        spot.place_name = spot.placeName;
+                        spot.address_name = spot.address;
+                        spot.place_url = "https://place.map.kakao.com/" + spot.id;
+
+                        let catParts = spot.category ? spot.category.split('>') : [];
+                        spot.category_name = catParts.length > 0 ? catParts.pop().trim() : '카테고리 없음';
+
+                        spot.stats = {
+                            viewCount: spot.viewCount || 0,
+                            heartCount: spot.heartCount || 0,
+                            reviewCount: spot.reviewCount || 0,
+                            avgRating: spot.avgRating || 0,
+                            liked: spot.liked || false
+                        };
+                        allPlaces.push(spot);
+                    }
+                    resolve();
+                });
+            });
+        }
+
+        // 데이터 준비가 완료되면 렌더링(필터링 포함)
+        updateSearch();
+    };
+
+    // -------------------------------------------------------------
+    // [수정] 카카오 검색이 아닌 DB 핫스팟 내에서 필터링하는 로직으로 변경
+    // -------------------------------------------------------------
+    function updateSearch() {
+        let keyword = keywordInput.value.trim().toLowerCase();
+        let searchAddr = "";
+
+        if (currentSelection.sido) {
+            searchAddr += currentSelection.sido;
+            if (currentSelection.sigugun && currentSelection.sigugun !== "전체") searchAddr += " " + currentSelection.sigugun;
+            if (currentSelection.dong && currentSelection.dong !== "전체") searchAddr += " " + currentSelection.dong;
+        }
+        let searchFood = currentSelection.foodName || "";
+
+        // DB에서 가져온 allPlaces 배열에서 조건에 맞는 것만 추려냄
+        filteredPlaces = allPlaces.filter(place => {
+            const matchKeyword = !keyword || (place.place_name && place.place_name.toLowerCase().includes(keyword));
+            const matchAddr = !searchAddr || (place.address_name && place.address_name.includes(searchAddr));
+            const matchFood = !searchFood || (place.category && place.category.includes(searchFood)); // 카테고리 문자열 포함 여부
+            return matchKeyword && matchAddr && matchFood;
+        });
+
+        // 필터 결과가 있고 주소 필터가 있다면 지도를 해당 핫스팟 위치로 이동
+        if (filteredPlaces.length > 0 && searchAddr) {
+            map.setCenter(new kakao.maps.LatLng(filteredPlaces[0].y, filteredPlaces[0].x));
+        } else if (searchAddr) {
+            // 결과가 없더라도 선택한 지역으로 지도는 이동시킴
+            geocoder.addressSearch(searchAddr, (result, status) => {
+                if (status === kakao.maps.services.Status.OK) {
+                    map.setCenter(new kakao.maps.LatLng(result[0].y, result[0].x));
+                }
+            });
+        }
+
+        displayPage(1); // 1페이지 출력 호출
+    }
 </script>
 </body>
 </html>

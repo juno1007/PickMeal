@@ -4,14 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d5434541-224c-465f-accd-78c92f7f54c4" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__24___5_39__________.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__24__오후_5_39,_체크아웃_전에_커밋되지_않은_변경_내용_[변경]/shelved.patch" beforeDir="false" />
+    <list default="true" id="d5434541-224c-465f-accd-78c92f7f54c4" name="변경" comment="26.03.04 1110 재민 코드 병합">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25___4_58__________.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25___5_14__________.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25___5_15__________.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25___9_09__________.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25__오전_9_09,_체크아웃_전에_커밋되지_않은_변경_내용_[변경]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25__오후_4_58,_체크아웃_전에_커밋되지_않은_변경_내용_[변경]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25__오후_5_14,_체크아웃_전에_커밋되지_않은_변경_내용_[변경]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25__오후_5_15,_체크아웃_전에_커밋되지_않은_변경_내용_[변경]/shelved.patch" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/java/PickMeal/PickMeal/controller/HotPlaceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/java/PickMeal/PickMeal/controller/HotPlaceController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/board-detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/board-detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/java/PickMeal/PickMeal/controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/java/PickMeal/PickMeal/controller/MainController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/java/PickMeal/PickMeal/controller/RestaurantController.java" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/java/PickMeal/PickMeal/controller/RestaurantController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/meal-spotter.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/meal-spotter.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/capsule.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/capsule.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,21 +26,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "woals10006-commits"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;woals10006-commits&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/dlive838-maker/PickMeal.git",
-    "accountId": "04b0600f-f63c-406a-b753-1f5c3038be60"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/dlive838-maker/PickMeal.git&quot;,
+    &quot;accountId&quot;: &quot;04b0600f-f63c-406a-b753-1f5c3038be60&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="3ASOB2o7nwEeC2E81BIWRLNDQGz" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -43,8 +48,10 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.PickMealApplication.executor": "Run",
-    "git-widget-placeholder": "jaemin"
+    "git-widget-placeholder": "jaemin",
+    "kotlin-language-version-configured": "true"
   }
 }]]></component>
   <component name="RunManager">
@@ -76,6 +83,26 @@
     </attachedChunks>
   </component>
   <component name="TaskManager">
+    <task id="LOCAL-00001" summary="26.03.04 1110 재민 코드 병합">
+      <option name="closed" value="true" />
+      <created>1772590249487</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1772590249487</updated>
+    </task>
+    <task active="true" id="Default" summary="디폴트 작업">
+      <changelist id="d5434541-224c-465f-accd-78c92f7f54c4" name="변경" comment="26.03.04 1110 재민 코드 병합" />
+      <created>1772668905941</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1772668905941</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="26.03.04 1110 재민 코드 병합" />
+    <option name="LAST_COMMIT_MESSAGE" value="26.03.04 1110 재민 코드 병합" />
   </component>
 </project>

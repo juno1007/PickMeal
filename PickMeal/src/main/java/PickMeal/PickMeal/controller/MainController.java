@@ -50,24 +50,49 @@ public class MainController {
         return "index"; // 인트로 화면
     }
 
-    @GetMapping("/next-page") //
+    @GetMapping("/next-page")
     public String next(Model model) {
+        // 1. 기존처럼 DB에서 핫스팟 목록 전체 가져오기
         List<HotSpot> hotSpotList = hotSpotService.getHotSpotList();
+
+        // 2. 중복을 걸러낸 식당만 담을 '새 리스트'와 중복 검사용 'Set' 생성
+        List<HotSpot> uniqueHotSpotList = new java.util.ArrayList<>();
+        java.util.Set<Long> uniqueResIds = new java.util.HashSet<>();
+
         for(HotSpot hs : hotSpotList){
-            PlaceStatsDto placeStatsDto = placeStatsService.getPlaceStatByKakaoIds(String.valueOf(hs.getResId()));
-            hs.setAddress(placeStatsDto.getAddress());
-            hs.setCategory(placeStatsDto.getCategory());
-            hs.setPlaceName(placeStatsDto.getPlaceName());
-            hs.setWishCount(placeStatsDto.getHeartCount());
-            hs.setViewCount(placeStatsDto.getViewCount());
-            hs.setReviewCount(placeStatsDto.getReviewCount());
-            hs.setAvgRating(placeStatsDto.getAvgRating());
+            Long resId = hs.getResId();
+
+            // 3. 중복 검사: 이미 Set에 들어있는 가게 식별자면 아래 코드를 무시하고 다음 반복으로 넘어감
+            if (uniqueResIds.contains(resId)) {
+                continue;
+            }
+            // 처음 확인된 가게면 Set에 기록해둠
+            uniqueResIds.add(resId);
+
+            // 4. 기존 로직 유지 (통계 정보 세팅)
+            PlaceStatsDto placeStatsDto = placeStatsService.getPlaceStatByKakaoIds(String.valueOf(resId));
+
+            // 정보가 정상적으로 있는 경우에만 세팅 후 새 리스트에 추가
+            if (placeStatsDto != null) {
+                hs.setAddress(placeStatsDto.getAddress());
+                hs.setCategory(placeStatsDto.getCategory());
+                hs.setPlaceName(placeStatsDto.getPlaceName());
+                hs.setWishCount(placeStatsDto.getHeartCount());
+                hs.setViewCount(placeStatsDto.getViewCount());
+                hs.setReviewCount(placeStatsDto.getReviewCount());
+                hs.setAvgRating(placeStatsDto.getAvgRating());
+
+                uniqueHotSpotList.add(hs); // 중복이 아닌 고유 식당만 추가
+            }
         }
+        uniqueHotSpotList.sort((a, b) -> Integer.compare(b.getWishCount(), a.getWishCount()));
 
         List<Food> gameTopList = foodService.getWinnerFoodList();
 
         model.addAttribute("gameTopList", gameTopList);
-        model.addAttribute("hotSpotList", hotSpotList);
+
+        // 5. 중복이 제거된 새 리스트(uniqueHotSpotList)를 화면으로 전달하도록 수정
+        model.addAttribute("hotSpotList", uniqueHotSpotList);
         return "next-page";
     }
 
