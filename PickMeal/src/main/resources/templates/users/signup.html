@@ -54,14 +54,14 @@
 <body class="py-20">
 <main class="flex items-center justify-center px-4">
   <div class="signup-card p-12 w-full max-w-2xl text-center border-2 border-gray-50">
-    <h2 class="text-4xl font-black text-[#FF8A5B] italic mb-2 uppercase tracking-tighter">Create Account</h2>
-    <p class="text-gray-400 font-bold mb-10 italic">Tell us more about your taste!</p>
+    <h2 class="text-4xl font-black text-[#FF8A5B] italic mb-2 uppercase tracking-tighter">회원 가입</h2>
+    <p class="text-gray-400 font-bold mb-10 italic">당신의 정보를 더 알려주세요!</p>
 
     <form id="signupForm" th:action="@{/users/signup}" th:object="${user}" method="post" onsubmit="return validateForm()" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
       <input type="hidden" th:field="*{socialId}"><input type="hidden" th:field="*{socialLoginSite}">
 
       <div class="space-y-4 md:col-span-2">
-        <label class="font-black text-gray-700 italic ml-2 uppercase">Basic Info</label>
+        <label class="font-black text-gray-700 italic ml-2 uppercase">기본 정보</label>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
             <div class="flex gap-2">
@@ -83,7 +83,7 @@
       </div>
 
       <div class="space-y-4 md:col-span-1">
-        <label class="font-black text-gray-700 italic ml-2 uppercase">User Info</label>
+        <label class="font-black text-gray-700 italic ml-2 uppercase">사용자 정보</label>
         <input type="text" th:field="*{name}" placeholder="이름" class="input-field" required>
         <div class="flex flex-col gap-1">
           <div class="flex gap-2">
@@ -95,7 +95,7 @@
       </div>
 
       <div class="space-y-4 md:col-span-1">
-        <label class="font-black text-gray-700 italic ml-2 uppercase">Detail Info</label>
+        <label class="font-black text-gray-700 italic ml-2 uppercase">세부 정보</label>
         <div class="flex flex-col gap-2">
           <div class="flex gap-2">
             <input type="email" th:field="*{email}" placeholder="이메일 주소" class="input-field" th:readonly="${isSocial}" required>
@@ -122,7 +122,7 @@
       </div>
 
       <div class="space-y-4 md:col-span-2">
-        <label class="font-black text-gray-700 italic ml-2 uppercase">Birth Info</label>
+        <label class="font-black text-gray-700 italic ml-2 uppercase">출생 정보</label>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input type="date" th:field="*{birthDate}" class="input-field text-gray-500" required>
           <select th:field="*{gender}" class="input-field text-gray-500" required>
@@ -134,14 +134,14 @@
       </div>
 
       <div class="space-y-4 md:col-span-2">
-        <label class="font-black text-gray-700 italic ml-2 uppercase text-sm">Food Taste</label>
+        <label class="font-black text-gray-700 italic ml-2 uppercase text-sm">음식 선호도</label>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <input type="text" th:field="*{likeMenu}" placeholder="좋아하는 음식" class="input-field">
           <input type="text" th:field="*{disLikeMenu}" placeholder="싫어하는 음식" class="input-field">
         </div>
       </div>
 
-      <button type="submit" class="bg-[#FF8A5B] md:col-span-2 text-white py-5 rounded-full font-black text-xl shadow-lg transition italic uppercase active:scale-95 mt-4">Welcome Aboard!</button>
+      <button type="submit" class="bg-[#FF8A5B] md:col-span-2 text-white py-5 rounded-full font-black text-xl shadow-lg transition italic uppercase active:scale-95 mt-4">가입을 환영합니다!</button>
     </form>
   </div>
 </main>

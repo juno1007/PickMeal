@@ -23,7 +23,7 @@ public class TwentyQuestionsController {
         GameResponseDto response = new GameResponseDto();
         List<String> remainingFoods = twentyQuestionsService.getFilteredFoods(request);
 
-        if (remainingFoods.size() <= 3 && remainingFoods.size() > 0) {
+        if (remainingFoods.size() <= 10 && remainingFoods.size() > 0) {
             response.setStatus("FINAL_CHOICE");
             response.setRemain_foodList(remainingFoods);
             response.setNextQuestion_text(twentyQuestionsService.getFinalQuestion());

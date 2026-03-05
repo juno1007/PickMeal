@@ -51,7 +51,7 @@
 
 <main class="flex-grow flex items-center justify-center content-slide-up px-4">
     <div class="login-card p-10 w-full max-w-md text-center border-2 border-gray-50">
-        <h2 class="text-5xl font-black text-[#FF8A5B] italic mb-10 uppercase tracking-tighter">Login</h2>
+        <h2 class="text-5xl font-black text-[#FF8A5B] italic mb-10 uppercase tracking-tighter">로그인</h2>
 
         <form th:action="@{/users/login}" method="post" id="loginForm" class="space-y-4">
 
@@ -68,12 +68,12 @@
                    class="input-field w-full px-6 py-4 bg-gray-50 border-2 border-transparent text-lg font-bold" required>
 
             <button type="submit" class="w-full bg-[#FF8A5B] text-white py-5 rounded-full font-black text-xl shadow-lg hover:brightness-110 transition italic uppercase active:scale-95 mt-2">
-                Let's Eat!
+                환영합니다!
             </button>
         </form>
 
         <div class="mt-12 mb-6">
-            <p class="text-gray-300 font-bold text-[10px] italic uppercase tracking-[0.2em]">Or login with</p>
+            <p class="text-gray-300 font-bold text-[10px] italic uppercase tracking-[0.2em]">SNS로 로그인하기</p>
         </div>
 
         <div class="flex justify-center items-center gap-5">
@@ -96,11 +96,11 @@
         </div>
 
         <div class="mt-10 text-xs font-bold text-gray-400 italic flex justify-center items-center gap-4">
-            <a href="/users/signup" class="hover:text-[#FF8A5B] transition uppercase">Sign Up</a>
+            <a href="/users/signup" class="hover:text-[#FF8A5B] transition uppercase">회원가입</a>
             <span class="text-gray-200">|</span>
-            <a href="/users/find-id" class="hover:text-[#FF8A5B] transition uppercase">Find ID</a>
+            <a href="/users/find-id" class="hover:text-[#FF8A5B] transition uppercase">ID 찾기</a>
             <span class="text-gray-200">|</span>
-            <a href="/users/forgot-pw" class="hover:text-[#FF8A5B] transition uppercase">Forgot PW</a>
+            <a href="/users/forgot-pw" class="hover:text-[#FF8A5B] transition uppercase">PW 찾기</a>
         </div>
 
     </div>

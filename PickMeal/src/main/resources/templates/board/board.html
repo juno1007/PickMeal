@@ -69,8 +69,8 @@
     <div class="max-w-7xl w-full">
         <div class="flex flex-col md:flex-row justify-between items-center md:items-end mb-8 gap-6">
             <div class="text-center md:text-left">
-                <h2 class="text-5xl font-black text-[#FF8A5B] italic uppercase tracking-tighter mb-2">Community Board</h2>
-                <p class="text-[#FF8A5B] font-bold italic">Share your tasty experiences!</p>
+                <h2 class="text-5xl font-black text-[#FF8A5B] italic uppercase tracking-tighter mb-2">커뮤니티 게시판</h2>
+                <p class="text-[#FF8A5B] font-bold italic">당신의 맛있는 경험을 공유해보세요!</p>
             </div>
 
             <div sec:authorize="isAuthenticated()">
@@ -81,7 +81,7 @@
             </div>
             <div sec:authorize="isAnonymous()">
                 <p class="text-gray-400 font-bold italic bg-white px-6 py-3 rounded-full shadow-sm">
-                    Please <a href="/users/login" class="text-[#FF8A5B] no-underline hover:underline">Login</a> to write a post!
+                     <a href="/users/login" class="text-[#FF8A5B] no-underline hover:underline">로그인해서</a> 글을 작성해 보세요!
                 </p>
             </div>
         </div>
@@ -90,13 +90,13 @@
             <table class="w-full text-left border-collapse min-w-[800px]">
                 <thead>
                 <tr class="bg-gray-50 border-b-2 border-[#FDF5E6]">
-                    <th class="px-6 py-5 text-[#FF8A5B] italic font-black text-sm uppercase text-center w-20">No</th>
-                    <th class="px-4 py-5 text-[#FF8A5B] italic font-black text-sm uppercase text-center w-20">Pic</th>
-                    <th class="px-8 py-5 text-[#FF8A5B] italic font-black text-sm uppercase">Title</th>
-                    <th class="px-6 py-5 text-[#FF8A5B] italic font-black text-sm uppercase text-center w-32">Author</th>
-                    <th class="px-6 py-5 text-[#FF8A5B] italic font-black text-sm uppercase text-center w-32">Date</th>
-                    <th class="px-4 py-5 text-[#FF8A5B] italic font-black text-sm uppercase text-center w-24">Views</th>
-                    <th class="px-4 py-5 text-[#FF8A5B] italic font-black text-sm uppercase text-center w-24">Like</th>
+                    <th class="px-6 py-5 text-[#FF8A5B] italic font-black text-sm uppercase text-center w-20">번호</th>
+                    <th class="px-4 py-5 text-[#FF8A5B] italic font-black text-sm uppercase text-center w-20">사진</th>
+                    <th class="px-8 py-5 text-[#FF8A5B] italic font-black text-sm uppercase">제목</th>
+                    <th class="px-6 py-5 text-[#FF8A5B] italic font-black text-sm uppercase text-center w-32">글쓴이</th>
+                    <th class="px-6 py-5 text-[#FF8A5B] italic font-black text-sm uppercase text-center w-32">날짜</th>
+                    <th class="px-4 py-5 text-[#FF8A5B] italic font-black text-sm uppercase text-center w-24">조회수</th>
+                    <th class="px-4 py-5 text-[#FF8A5B] italic font-black text-sm uppercase text-center w-24">좋아요</th>
                 </tr>
                 </thead>
                 <tbody class="text-gray-700 font-bold">
@@ -185,7 +185,7 @@
 
                     <button type="submit"
                             class="bg-[#FF8A5B] text-white px-8 py-2.5 rounded-full font-black hover:bg-[#ff7a45] transition-all transform hover:scale-105 shadow-md active:scale-95">
-                        SEARCH
+                        검색
                     </button>
                 </form>
             </div>

@@ -77,14 +77,14 @@
 <div class="overflow-y-auto flex-grow">
   <main class="flex items-center justify-center content-slide-up py-10">
     <div class="main-title-area">
-      <h1 class="custom-main-title mb-2">Community Board</h1>
-      <p>Share your tasty experiences!</p>
+      <h1 class="custom-main-title mb-2">커뮤니티 게시판</h1>
+      <p>당신의 맛있는 경험을 공유해보세요!</p>
     </div>
 
     <div class="board-container">
       <div class="board-header">
         <h2 class="board-title">
-          <span th:if="${board.is_notice == 'Y'}" class="bg-[#FF7F50] text-white text-xs px-2 py-1 rounded-md align-middle mr-2">NOTICE</span>
+          <span th:if="${board.is_notice == 'Y'}" class="bg-[#FF7F50] text-white text-xs px-2 py-1 rounded-md align-middle mr-2">Notice</span>
           <span th:text="${board.title}">게시글 제목</span>
         </h2>
         <div class="board-meta">
@@ -94,7 +94,7 @@
             <span th:if="${board.updateDate != null}" th:text="'최종 수정일 : ' + ${#dates.format(board.updateDate, 'yyyy-MM-dd HH:mm')} + ' (수정됨)'">수정일</span>
           </div>
           <div>
-            <span th:text="'VIEWS : ' + ${board.viewCount}">조회수</span>
+            <span th:text="'조회수 : ' + ${board.viewCount}">조회수</span>
             <span class="like-count">❤️ <span th:text="${board.likeCount}">15</span></span>
           </div>
         </div>

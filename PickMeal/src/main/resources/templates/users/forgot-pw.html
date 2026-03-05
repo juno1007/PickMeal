@@ -54,31 +54,31 @@
 
 <main class="flex-grow flex items-center justify-center content-slide-up">
   <div class="forgot-card p-12 w-full max-w-lg text-center mx-4 border-2 border-gray-50">
-    <h2 class="text-4xl font-black text-[#FF8A5B] italic mb-2 uppercase tracking-tighter">Reset Password</h2>
-    <p class="text-gray-400 font-bold mb-10 italic">Enter your ID and Email to recover</p>
+    <h2 class="text-4xl font-black text-[#FF8A5B] italic mb-2 uppercase tracking-tighter">비밀번호 초기화</h2>
+    <p class="text-gray-400 font-bold mb-10 italic">당신의 ID와 EMAIL을 입력해주세요</p>
 
     <form id="forgotForm" class="space-y-6 text-left">
       <div class="space-y-2">
-        <label class="font-black text-gray-700 italic ml-2 uppercase text-sm">Identification</label>
-        <input type="text" id="userId" placeholder="YOUR ID" class="input-field px-6 py-4 bg-gray-50 font-bold" required>
+        <label class="font-black text-gray-700 italic ml-2 uppercase text-sm">ID 입력</label>
+        <input type="text" id="userId" placeholder="ID" class="input-field px-6 py-4 bg-gray-50 font-bold" required>
       </div>
 
       <div class="space-y-2">
-        <label class="font-black text-gray-700 italic ml-2 uppercase text-sm">Email Verification</label>
+        <label class="font-black text-gray-700 italic ml-2 uppercase text-sm">이메일 인증</label>
         <div class="flex gap-2">
-          <input type="email" id="userEmail" placeholder="REGISTERED EMAIL" class="input-field px-6 py-4 bg-gray-50 font-bold" required>
-          <button type="button" onclick="verifyEmail()" class="btn-check shadow-sm uppercase text-xs">Verify</button>
+          <input type="email" id="userEmail" placeholder="EMAIL" class="input-field px-6 py-4 bg-gray-50 font-bold" required>
+          <button type="button" onclick="verifyEmail()" class="btn-check shadow-sm uppercase text-xs">발송</button>
         </div>
       </div>
 
       <button type="submit" class="btn-primary w-full text-white py-5 rounded-full font-black text-xl shadow-lg transition italic uppercase active:scale-95 mt-4">
-        Send Reset Link
+        초기화 링크 보내기
       </button>
     </form>
 
     <div class="mt-8 text-sm font-bold text-gray-400 italic">
-      Remembered your password?
-      <a href="/login" class="text-[#FF8A5B] hover:underline ml-1">BACK TO LOGIN</a>
+      비밀번호가 기억나신가요?
+      <a href="/login" class="text-[#FF8A5B] hover:underline ml-1">로그인으로 돌아가기</a>
     </div>
   </div>
 </main>

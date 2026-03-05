@@ -62,15 +62,15 @@
         <div class="arrow"></div>
         <canvas id="canvas" width="400" height="400"></canvas>
       </div>
-      <button onclick="spin()" id="spin-btn" class="mt-10 bg-[#FF8A5B] text-white px-12 py-4 rounded-full font-black text-2xl shadow-lg hover:scale-105 transition italic uppercase">Spin!</button>
+      <button onclick="spin()" id="spin-btn" class="mt-10 bg-[#FF8A5B] text-white px-12 py-4 rounded-full font-black text-2xl shadow-lg hover:scale-105 transition italic uppercase">돌려주세요!</button>
     </div>
 
     <div class="bg-white p-10 rounded-[3rem] shadow-xl w-full max-w-md border-4 border-[#FF8A5B]">
-      <h2 class="text-3xl font-black text-[#FF8A5B] italic mb-6 uppercase">Menu List</h2>
+      <h2 class="text-3xl font-black text-[#FF8A5B] italic mb-6 uppercase">음식 리스트</h2>
       <div id="item-list" class="space-y-3 mb-6 max-h-[300px] overflow-y-auto pr-2 scroller">
       </div>
       <div class="flex gap-2">
-        <input type="text" id="new-item" placeholder="Add menu..." class="input-field flex-grow px-4 py-3 font-bold" onkeypress="if(event.keyCode==13) addItem()">
+        <input type="text" id="new-item" placeholder="음식을 입력해주세요..." class="input-field flex-grow px-4 py-3 font-bold" onkeypress="if(event.keyCode==13) addItem()">
         <button onclick="addItem()" class="bg-[#4CAF50] text-white px-6 py-3 rounded-2xl font-black shadow-md hover:bg-[#43a047] transition">+</button>
       </div>
       <p class="text-gray-400 mt-4 text-sm font-bold italic text-center">Min 2, Max 12 items recommended!</p>
