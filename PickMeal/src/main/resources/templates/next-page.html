@@ -117,7 +117,7 @@
 
                             <div class="flex justify-center items-center gap-2 transition group-hover:scale-110 drop-shadow-md">
                                 <span class="text-4xl drop-shadow-lg">❤️</span>
-                                <span class="text-[#FF8A5B] text-2xl font-black" th:text="${hotSpot.wishCount} + ' Pick!'">5 Pick!</span>
+                                <span class="text-[#FF8A5B] text-2xl font-black" th:text="${hotSpot.wishCount} + ' Pick!'" th:id="'big-heart-count-' + ${hotSpot.resId}">5 Pick!</span>
                             </div>
 
                             <div class="flex justify-between items-center mt-6">
@@ -127,12 +127,23 @@
 
                                     <span class="flex items-center gap-1 text-orange-400">👁️ <span class="text-gray-700" th:id="'view-count-'+${hotSpot.resId}" th:text="${hotSpot.viewCount}">15</span></span>
 
-                                    <button th:data-id="${hotSpot.resId}"
+                                    <button th:if="${hotSpot.isWished == true}"
+                                            th:data-id="${hotSpot.resId}"
                                             th:data-name="${hotSpot.placeName}"
                                             onclick="handleHeart(this, event)"
                                             class="ani-btn flex items-center gap-1 text-orange-400 hover:scale-110 transition">
                                         ❤️ <span class="text-gray-700 heart-count-text" th:id="'heart-count-'+${hotSpot.resId}" th:text="${hotSpot.wishCount}">10</span>
                                     </button>
+
+                                    <button th:if="${hotSpot.isWished == false}"
+                                            th:data-id="${hotSpot.resId}"
+                                            th:data-name="${hotSpot.placeName}"
+                                            onclick="handleHeart(this, event)"
+                                            class="ani-btn flex items-center gap-1 text-gray-400 hover:scale-110 transition">
+                                        🤍 <span class="text-gray-700 heart-count-text" th:id="'heart-count-'+${hotSpot.resId}" th:text="${hotSpot.wishCount}">10</span>
+                                    </button>
+
+                                    <span class="flex items-center gap-1 text-blue-400">📝 <span class="text-gray-700" th:text="${hotSpot.reviewCount ?: 0}">0</span></span>
 
                                 </div>
 
@@ -174,6 +185,7 @@ async function handleHeart(btn, event) {
     const id = btn.getAttribute('data-id');
     const placeName = btn.getAttribute('data-name');
 
+
     btn.classList.add('animate');
     setTimeout(() => btn.classList.remove('animate'), 400);
 
@@ -181,6 +193,17 @@ async function handleHeart(btn, event) {
     const res = await fetch(`/hotplace/heart/${id}?${params.toString()}`, { method: 'POST' });
 
     if (res.ok) {
+
+        if (btn.innerHTML.includes('🤍')) {
+            btn.innerHTML = btn.innerHTML.replace('🤍', '❤️');
+            btn.classList.remove('text-gray-400');
+            btn.classList.add('text-orange-400');
+        } else {
+            btn.innerHTML = btn.innerHTML.replace('❤️', '🤍');
+            btn.classList.remove('text-orange-400');
+            btn.classList.add('text-gray-400');
+        }
+
         updateStats(id);
     } else {
         alert("찜하기에 실패했습니다. 로그인이 되어있는지 확인해 주세요!");
@@ -194,7 +217,8 @@ async function updateStats(id) {
         const s = data[0];
         document.querySelectorAll(`[id^="avg-rating-${id}"]`).forEach(el => el.innerText = s.avgRating || 0);
         document.querySelectorAll(`[id^="view-count-${id}"]`).forEach(el => el.innerText = s.viewCount);
-        document.querySelectorAll(`[id^="heart-count-${id}"]`).forEach(el => el.innerText = s.wishCount);
+        document.querySelectorAll(`[id^="heart-count-${id}"]`).forEach(el => el.innerText = s.heartCount);
+        document.querySelectorAll(`[id^="big-heart-count-${id}"]`).forEach(el => el.innerText = s.heartCount + ' Pick!');
     }
 }
 

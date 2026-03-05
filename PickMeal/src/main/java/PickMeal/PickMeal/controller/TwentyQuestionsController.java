@@ -21,31 +21,27 @@ public class TwentyQuestionsController {
     @PostMapping("/next")
     public ResponseEntity<GameResponseDto> getNextStep(@RequestBody GameRequestDto request) {
         GameResponseDto response = new GameResponseDto();
-        List<String> remainingFoods = twentyQuestionsService.getFilteredFoods(request);
 
-        if (remainingFoods.size() <= 2 && remainingFoods.size() > 0) {
+        int askedCount = request.getAskedQuestionIds() != null ? request.getAskedQuestionIds().size() : 0;
+
+        Questions nextQuestion = twentyQuestionsService.getNextValidQuestion(request);
+
+        if (askedCount >= 15 || nextQuestion == null) {
             response.setStatus("FINAL_CHOICE");
-            response.setRemain_foodList(remainingFoods);
-            response.setNextQuestion_text(twentyQuestionsService.getFinalQuestion());
+            response.setRemain_foodList(twentyQuestionsService.getTopScoredFoods(request));
+            return ResponseEntity.ok(response);
         }
-        else if (remainingFoods.isEmpty()) {
-            response.setStatus("NO_FOOD");
-        }
-        else {
-            response.setStatus("QUESTION");
-            Questions nextQuestion = twentyQuestionsService.getNextValidQuestion(request);
 
-            response.setNextQuestion_id(nextQuestion.getQuestion_id());
-            response.setNextQuestion_text(nextQuestion.getQuestion_text());
-            response.setNextAttribute_name(nextQuestion.getAttribute_name());
-        }
-        // 모든 경로에 대해 최종 결과 반환
+        response.setStatus("QUESTION");
+        response.setNextQuestion_id(nextQuestion.getQuestion_id());
+        response.setNextQuestion_text(nextQuestion.getQuestion_text());
+        response.setNextAttribute_name(nextQuestion.getAttribute_name());
+
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/api/food/imagePath")
     public String getImagePath(@RequestParam("foodName") String foodName) {
-        // DB에서 음식 이름으로 imagePath를 찾아오는 메서드 실행
         String imagePath = twentyQuestionsService.findImagePathByName(foodName);
         return imagePath;
     }

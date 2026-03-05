@@ -117,9 +117,8 @@
     function askFinalFood() {
     if (remainingFoods.length > 0) {
         currentSuggestingFood = remainingFoods.shift();
-        // finalTemplate이 null이면 기본값 처리
         const template = finalTemplate || "는 어떠신가요? 🤔";
-        document.getElementById('question-text').innerText = currentSuggestingFood + template;
+        document.getElementById('question-text').innerText = `혹시 생각하신 음식이 '${currentSuggestingFood}' 일까요? 😋`;
         currentQuestionStep++;
         updateProgressBar();
     } else {

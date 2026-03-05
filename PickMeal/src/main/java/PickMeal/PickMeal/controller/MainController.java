@@ -48,7 +48,13 @@ public class MainController {
     }
 
     @GetMapping("/next-page")
-    public String next(Model model) {
+    public String next(Authentication authentication, Model model) {
+
+        User user = null;
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+            user = userService.getAuthenticatedUser(authentication);
+        }
+
         // 1. 기존처럼 DB에서 핫스팟 목록 전체 가져오기
         List<HotSpot> hotSpotList = hotSpotService.getHotSpotList();
 
@@ -78,6 +84,12 @@ public class MainController {
                 hs.setViewCount(placeStatsDto.getViewCount());
                 hs.setReviewCount(placeStatsDto.getReviewCount());
                 hs.setAvgRating(placeStatsDto.getAvgRating());
+
+                if(user != null && placeStatsService.isCurrentUserHearted(user.getId(), resId)){
+                    hs.setWished(true);
+                }else {
+                    hs.setWished(false);
+                }
 
                 uniqueHotSpotList.add(hs); // 중복이 아닌 고유 식당만 추가
             }

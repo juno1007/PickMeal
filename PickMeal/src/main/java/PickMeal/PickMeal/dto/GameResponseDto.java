@@ -14,4 +14,5 @@ public class GameResponseDto {
     private String nextQuestion_text;
     private String nextAttribute_name;
     private List<String> remain_foodList;
+    private String final_recommendation;
 }

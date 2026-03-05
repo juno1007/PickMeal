@@ -278,9 +278,6 @@ public class UserService implements UserDetailsService {
             loginId = authentication.getName(); // 일반 로그인 aaa
         }
 
-        // [중요 로그] 여기서 null인지, 값이 이상한지 꼭 보세요.
-        System.out.println(">>> [DB 조회 직전 ID 확인] : " + loginId);
-
         if (loginId == null || loginId.isEmpty()) return null;
 
         try {

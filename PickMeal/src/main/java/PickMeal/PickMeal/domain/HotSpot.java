@@ -17,4 +17,5 @@ public class HotSpot {
     private int viewCount;
     private int reviewCount;
     private double avgRating;
+    private boolean isWished;
 }

@@ -20,4 +20,6 @@ public interface FoodMapper {
     Food findByName(@Param("name") String name);
 
     List<Food> getWinnerFoodList();
+
+    List<String> getTopScoredFoods(GameRequestDto request);
 }

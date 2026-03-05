@@ -68,4 +68,8 @@ public class TwentyQuestionsService {
     public String findImagePathByName(String foodName) {
         return foodMapper.findImagePathByName(foodName);
     }
+
+    public List<String> getTopScoredFoods(GameRequestDto request) {
+        return foodMapper.getTopScoredFoods(request);
+    }
 }

@@ -243,4 +243,16 @@ public class PlaceStatsService {
 
         return totalHearts;
     }
+
+    public boolean isCurrentUserHearted(String userId, long resId) {
+        if (userId == null || userId.isEmpty()) {
+            return false;
+        }
+
+        String sql = "SELECT COUNT(*) FROM place_stats WHERE user_id = ? AND res_id = ? AND is_wish = 1";
+
+        Integer wishCount = jdbcTemplate.queryForObject(sql, Integer.class, userId, resId);
+
+        return wishCount != null && wishCount > 0;
+    }
 }
