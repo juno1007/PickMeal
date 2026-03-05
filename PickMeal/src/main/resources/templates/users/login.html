@@ -7,16 +7,35 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         body {
-            font-family: 'Fredoka', sans-serif;
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
             background-color: #FFF5F0;
             margin: 0;
-            overflow: hidden;
-            height: 100vh;
+
+            /* 기존 height: 100vh; 와 overflow: hidden; 을 아래 코드로 교체합니다 */
+            min-height: 100vh; /* 창 크기를 줄이면 자연스럽게 세로 스크롤바가 생성되도록 최소 높이만 보장 */
             display: flex;
             flex-direction: column;
+            overflow-x: hidden; /* 가로로 삐져나오는 것만 잘라내고, 세로 스크롤은 허용 */
         }
-        .nav-link { font-family: 'Fredoka', sans-serif; font-weight: 700; font-style: italic; }
+
+        h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            font-style: normal !important;
+        }
+
+        header .text-3xl,
+        header .nav-link,
+        header button,
+        header a,
+        .nav-link {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            font-weight: 800 !important;
+            font-style: italic !important;
+        }
+
+        .nav-link { font-family: 'Fredoka', 'Jua', sans-serif; font-weight: 700; font-style: italic; }
 
         /* 나타나는 애니메이션 */
         .content-slide-up {
@@ -49,9 +68,9 @@
 <body>
 <header th:replace="~{fragments/header :: headerFragment}"></header>
 
-<main class="flex-grow flex items-center justify-center content-slide-up px-4">
+<main class="flex-grow flex items-start justify-center content-slide-up px-4 pt-32 pb-10">
     <div class="login-card p-10 w-full max-w-md text-center border-2 border-gray-50">
-        <h2 class="text-5xl font-black text-[#FF8A5B] italic mb-10 uppercase tracking-tighter">로그인</h2>
+        <h2 class="text-5xl font-black text-[#FF8A5B] italic mb-10 uppercase tracking-tighter">LOGIN</h2>
 
         <form th:action="@{/users/login}" method="post" id="loginForm" class="space-y-4">
 
@@ -68,7 +87,7 @@
                    class="input-field w-full px-6 py-4 bg-gray-50 border-2 border-transparent text-lg font-bold" required>
 
             <button type="submit" class="w-full bg-[#FF8A5B] text-white py-5 rounded-full font-black text-xl shadow-lg hover:brightness-110 transition italic uppercase active:scale-95 mt-2">
-                환영합니다!
+                환영합니다
             </button>
         </form>
 
@@ -105,5 +124,6 @@
 
     </div>
 </main>
+<footer th:replace="~{fragments/footer :: footerFragment}"></footer>
 </body>
 </html>

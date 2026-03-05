@@ -8,19 +8,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         /* 룰렛창 기반 레이아웃 엔진 */
         body {
-            font-family: 'Fredoka', sans-serif;
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
             background-color: #FFF5F0;
             margin: 0;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header, footer { z-index: 1200 !important; position: relative; }
+
+        h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            font-style: normal !important;
         }
 
         .nav-link {
-            font-family: 'Fredoka', sans-serif !important;
+            font-family: 'Fredoka','Jua', sans-serif !important;
             font-weight: 700 !important;
             font-style: italic !important;
             display: inline-block !important;
@@ -33,7 +41,6 @@
             align-items: center;
             padding-top: 100px;
             padding-bottom: 40px;
-            overflow-y: auto;
             box-sizing: border-box;
         }
 
@@ -52,10 +59,6 @@
             from { transform: translateY(50px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-
-        main::-webkit-scrollbar { width: 8px; }
-        main::-webkit-scrollbar-track { background: #FFF5F0; }
-        main::-webkit-scrollbar-thumb { background: #FF8A5B; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -78,7 +81,7 @@
                     <th class="py-4 px-2 text-right">Wins</th>
                 </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50">
+                <tbody id="ranking-tbody" class="divide-y divide-gray-50">
                 <tr th:each="food, iterStat : ${rankingList}"
                     th:classappend="${iterStat.count == 1} ? 'bg-orange-50' : ''"
                     class="hover:bg-orange-100 transition-colors group">
@@ -111,6 +114,8 @@
             </table>
         </div>
 
+        <div id="pagination" class="flex justify-center items-center gap-2 mt-8"></div>
+
         <div class="mt-12 flex flex-col md:flex-row justify-center items-center gap-4 max-w-2xl mx-auto">
             <button onclick="location.href='/next-page'"
                     class="w-full md:w-auto px-10 py-4 bg-[#FF8A5B] text-white rounded-full font-black text-xl shadow-lg hover:scale-105 transition-all italic uppercase">
@@ -140,6 +145,46 @@
             alert("✨ 랭킹 주소가 복사되었습니다!");
         });
     };
+
+    // [핵심] 프론트엔드 페이징 스크립트 추가
+    document.addEventListener("DOMContentLoaded", function() {
+        const rowsPerPage = 5; // 한 번에 보여줄 행 개수
+        const tbody = document.getElementById('ranking-tbody');
+        const rows = tbody.querySelectorAll('tr');
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
+        const paginationContainer = document.getElementById('pagination');
+
+        if (rows.length === 0) return;
+
+        function showPage(page) {
+            // 모든 행을 돌면서 현재 페이지에 해당하는 것만 보이기
+            rows.forEach((row, index) => {
+                row.style.display = (index >= (page - 1) * rowsPerPage && index < page * rowsPerPage) ? '' : 'none';
+            });
+
+            // 페이지 버튼 새로 그리기
+            paginationContainer.innerHTML = '';
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.innerText = i;
+
+                // 현재 선택된 페이지 버튼 디자인
+                if (i === page) {
+                    btn.className = "w-10 h-10 rounded-full font-black text-lg bg-[#FF8A5B] text-white shadow-md transform scale-110 transition-all";
+                }
+                // 다른 페이지 버튼 디자인
+                else {
+                    btn.className = "w-10 h-10 rounded-full font-black text-lg bg-orange-100 text-orange-400 hover:bg-orange-200 transition-all";
+                }
+
+                btn.onclick = () => showPage(i);
+                paginationContainer.appendChild(btn);
+            }
+        }
+
+        // 처음에 1페이지 강제 표시
+        showPage(1);
+    });
 </script>
 </body>
 </html>

@@ -20,174 +20,182 @@
   <meta name="_csrf_header" th:content="${_csrf?.headerName}" th:if="${_csrf}"/>
 
   <style>
-    body {
-        font-family: 'Fredoka', sans-serif;
-        background-color: #FFF5F0;
-        margin: 0;
-        overflow: hidden;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
+    @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+   body {
+       font-family: 'Fredoka', 'Jua', sans-serif !important;
+       background-color: #FFF5F0;
+       margin: 0;
+       overflow: hidden;
+       height: 100vh;
+       display: flex;
+       flex-direction: column;
+   }
 
-    .nav-link { font-family: 'Fredoka', sans-serif; font-weight: 700; font-style: italic; }
+    h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            font-style: normal !important;
+        }
 
-    .content-slide-up {
-        animation: slideUp 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
-        will-change: transform, opacity;
-    }
+   .nav-link { font-family: 'Fredoka', 'Jua', sans-serif; font-weight: 700; font-style: italic; }
 
-    @keyframes slideUp {
-        from { transform: translateY(100px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
+   .content-slide-up {
+       animation: slideUp 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+       will-change: transform, opacity;
+   }
 
-    .write-card {
-        border-radius: 3rem;
-        background: white;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-    }
+   @keyframes slideUp {
+       from { transform: translateY(100px); opacity: 0; }
+       to { transform: translateY(0); opacity: 1; }
+   }
 
-    /* 툴바 드롭다운 스타일 최적화 */
-    .toolbar-btn {
-        background-color: #FFF5EF;
-        color: #FF8A5B;
-        padding: 0.5rem 0.8rem;
-        border-radius: 0.8rem;
-        font-weight: 800;
-        transition: all 0.2s;
-        font-size: 0.8rem;
-        border: none;
-        outline: none;
-        cursor: pointer;
-    }
-    .toolbar-btn:hover {
-        background-color: #FF8A5B;
-        color: white;
-    }
+   .write-card {
+       border-radius: 3rem;
+       background: white;
+       box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+   }
 
-    .input-field {
-        border-radius: 1.5rem;
-        transition: all 0.3s;
-        border: 2px solid #FDF5E6;
-        width: 100%;
-    }
+   /* 툴바 드롭다운 스타일 최적화 */
+   .toolbar-btn {
+       background-color: #FFF5EF;
+       color: #FF8A5B;
+       padding: 0.5rem 0.8rem;
+       border-radius: 0.8rem;
+       font-weight: 800;
+       transition: all 0.2s;
+       font-size: 0.8rem;
+       border: none;
+       outline: none;
+       cursor: pointer;
+   }
+   .toolbar-btn:hover {
+       background-color: #FF8A5B;
+       color: white;
+   }
 
-    .input-field:focus {
-        border-color: #FF8A5B;
-        outline: none;
-        background: white;
-    }
+   .input-field {
+       border-radius: 1.5rem;
+       transition: all 0.3s;
+       border: 2px solid #FDF5E6;
+       width: 100%;
+   }
 
-    textarea.input-field {
-        resize: none;
-        height: 300px;
-        font-family: 'Fredoka', sans-serif;
-    }
+   .input-field:focus {
+       border-color: #FF8A5B;
+       outline: none;
+       background: white;
+   }
 
-    /* 🍊🍊 썸머노트를 쓰기위한 커스텀 css. 바꾸려면 이 부분을 바꿔야함! 🍊🍊 */
-    /* 에디터 전체 테두리 없애고 깔끔하게 */
-    .note-editor.note-frame {
-        border: none !important;
-        box-shadow: none !important;
-    }
+   header, header *, .italic-text { font-style: italic !important; }
 
-    /* 툴바 영역 배경색과 둥근 테두리 설정 (기존 디자인 유지) */
-    .note-toolbar {
-        background-color: #FDF5E6 !important; /* 연한 오렌지색 배경 */
-        border-radius: 1.2rem !important;
-        padding: 0.8rem !important;
-        border-bottom: none !important;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-    }
+   textarea.input-field {
+       resize: none;
+       height: 300px;
+       font-family: 'Fredoka', sans-serif;
+   }
 
-    /* 툴바 버튼 그룹핑 박스 투명하게 */
-    .note-btn-group {
-        background: transparent !important;
-        border: none !important;
-        margin-right: 5px !important;
-    }
+   /* 🍊🍊 썸머노트를 쓰기위한 커스텀 css. 바꾸려면 이 부분을 바꿔야함! 🍊🍊 */
+   /* 에디터 전체 테두리 없애고 깔끔하게 */
+   .note-editor.note-frame {
+       border: none !important;
+       box-shadow: none !important;
+   }
 
-    /* 툴바 버튼 기본 스타일 (둥글고 오렌지색 글씨) */
-    .note-btn {
-        background-color: #FFF5EF !important;
-        color: #FF8A5B !important; /* 오렌지색 포인트 */
-        border: none !important;
-        border-radius: 0.8rem !important;
-        padding: 0.6rem 0.9rem !important;
-        font-weight: 800 !important;
-        transition: all 0.2s !important;
-        box-shadow: none !important;
-    }
+   /* 툴바 영역 배경색과 둥근 테두리 설정 (기존 디자인 유지) */
+   .note-toolbar {
+       background-color: #FDF5E6 !important; /* 연한 오렌지색 배경 */
+       border-radius: 1.2rem !important;
+       padding: 0.8rem !important;
+       border-bottom: none !important;
+       display: flex;
+       flex-wrap: wrap;
+       gap: 5px;
+   }
 
-    /* 버튼에 마우스 올렸을 때 & 클릭되었을 때 (활성화) */
-    .note-btn:hover, .note-btn.active {
-        background-color: #FF8A5B !important;
-        color: white !important;
-    }
+   /* 툴바 버튼 그룹핑 박스 투명하게 */
+   .note-btn-group {
+       background: transparent !important;
+       border: none !important;
+       margin-right: 5px !important;
+   }
 
-    /* 드롭다운 메뉴 스타일 (폰트/크기 선택창) */
-    .note-dropdown-menu {
-        border-radius: 1rem !important;
-        border: 2px solid #FDF5E6 !important;
-        padding: 0.5rem !important;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
-    }
-    /* 드롭다운 항목 호버 효과 */
-    .note-dropdown-item:hover {
-        background-color: #FFF5EF !important;
-        color: #FF8A5B !important;
-        border-radius: 0.5rem;
-    }
+   /* 툴바 버튼 기본 스타일 (둥글고 오렌지색 글씨) */
+   .note-btn {
+       background-color: #FFF5EF !important;
+       color: #FF8A5B !important; /* 오렌지색 포인트 */
+       border: none !important;
+       border-radius: 0.8rem !important;
+       padding: 0.6rem 0.9rem !important;
+       font-weight: 800 !important;
+       transition: all 0.2s !important;
+       box-shadow: none !important;
+   }
 
-    /* 글쓰기 본문 영역 스타일 */
-    .note-editable {
-        background-color: #FAFAFA !important; /* 아주 연한 회색 배경 */
-        border-radius: 1.5rem !important;
-        border: 2px solid #FDF5E6 !important;
-        padding: 2rem !important;
-        font-family: 'Fredoka', sans-serif; /* 기본 폰트 설정 */
-        font-size: 20px;
-        font-weight: bold;
-        color: #444;
-        line-height: 1.8 !important;
-        min-height: 400px; /* 최소 높이 확보 */
-    }
-    /* 본문 영역 포커스 됐을 때 (주황색 테두리) */
-    .note-editor.note-frame .note-editing-area .note-editable:focus {
-        border-color: #FF8A5B !important;
-        outline: none !important;
-    }
+   /* 버튼에 마우스 올렸을 때 & 클릭되었을 때 (활성화) */
+   .note-btn:hover, .note-btn.active {
+       background-color: #FF8A5B !important;
+       color: white !important;
+   }
 
-    /* 상태바 (맨 아래 resize bar) 숨기기 */
-    .note-statusbar {
-        display: none !important;
-    }
+   /* 드롭다운 메뉴 스타일 (폰트/크기 선택창) */
+   .note-dropdown-menu {
+       border-radius: 1rem !important;
+       border: 2px solid #FDF5E6 !important;
+       padding: 0.5rem !important;
+       box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
+   }
+   /* 드롭다운 항목 호버 효과 */
+   .note-dropdown-item:hover {
+       background-color: #FFF5EF !important;
+       color: #FF8A5B !important;
+       border-radius: 0.5rem;
+   }
 
-    /* Placeholder 스타일 */
-    .note-placeholder {
-        color: #ccc !important;
-        font-family: 'Fredoka', sans-serif !important;
-        font-weight: bold !important;
-        padding: 2rem !important;
-        font-size: 20px !important;
-    }
+   /* 글쓰기 본문 영역 스타일 */
+   .note-editable {
+       background-color: #FAFAFA !important; /* 아주 연한 회색 배경 */
+       border-radius: 1.5rem !important;
+       border: 2px solid #FDF5E6 !important;
+       padding: 2rem !important;
+       font-family: 'Fredoka', sans-serif; /* 기본 폰트 설정 */
+       font-size: 20px;
+       font-weight: bold;
+       color: #444;
+       line-height: 1.8 !important;
+       min-height: 400px; /* 최소 높이 확보 */
+   }
+   /* 본문 영역 포커스 됐을 때 (주황색 테두리) */
+   .note-editor.note-frame .note-editing-area .note-editable:focus {
+       border-color: #FF8A5B !important;
+       outline: none !important;
+   }
 
-    .note-editable ul {
-    list-style-type: disc !important;
-    list-style-position: inside !important;
-    padding-left: 20px !important;
-    margin-bottom: 10px !important;
-    }
+   /* 상태바 (맨 아래 resize bar) 숨기기 */
+   .note-statusbar {
+       display: none !important;
+   }
 
-    .note-editable ol {
-        list-style-type: decimal !important;
-        list-style-position: inside !important;
-        padding-left: 20px !important;
-        margin-bottom: 10px !important;
-    }
+   /* Placeholder 스타일 */
+   .note-placeholder {
+       color: #ccc !important;
+       font-family: 'Fredoka', 'Jua',  sans-serif !important;
+       font-weight: bold !important;
+       padding: 2rem !important;
+       font-size: 20px !important;
+   }
+
+   .note-editable ul {
+   list-style-type: disc !important;
+   list-style-position: inside !important;
+   padding-left: 20px !important;
+   margin-bottom: 10px !important;
+   }
+
+   .note-editable ol {
+       list-style-type: decimal !important;
+       list-style-position: inside !important;
+       padding-left: 20px !important;
+       margin-bottom: 10px !important;
+   }
   </style>
 </head>
 <body>
@@ -197,8 +205,8 @@
   <main class="flex items-center justify-center content-slide-up py-10">
     <div class="write-card p-12 w-full max-w-4xl mx-4 border-2 border-gray-50">
       <div class="mb-8 text-center md:text-left">
-        <h2 class="text-4xl font-black text-[#FF8A5B] italic uppercase tracking-tighter">New Post</h2>
-        <p class="text-gray-400 font-bold italic">Express your taste in your own style!</p>
+        <h2 class="text-4xl font-black text-[#FF8A5B] italic uppercase tracking-tighter">새 게시물</h2>
+        <p class="text-gray-400 font-bold italic">자신만의 스타일로 취향을 표현하세요!</p>
       </div>
 
       <form id="writeForm" th:action="@{/board/write}" method="post" enctype="multipart/form-data" class="space-y-6">
@@ -244,7 +252,7 @@
         $('#postContent').summernote({
             height: 500,                 // 에디터 높이
             lang: "ko-KR",               // 한글 설정
-            placeholder: '당신의 맛있는 경험을 자유롭게 적어주세요! 🍕',
+            placeholder: '당신의 맛있는 경험을 자유롭게 적어주세요!',
             disableResizeEditor: true,   // 크기 조절 바 숨기기
 
             dialogsInBody: true,

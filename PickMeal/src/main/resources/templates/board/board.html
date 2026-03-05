@@ -8,9 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         /* [공통] 폰트 및 배경 설정 */
         body {
-            font-family: 'Fredoka', sans-serif;
+            font-family: 'Fredoka', 'Jua', sans-serif;
             background-color: #FFF5F0;
             margin: 0;
             display: flex;
@@ -18,12 +19,14 @@
             min-height: 100vh;
         }
 
+        h1, h2, h3, h4, h5, h6, p, span, div, button, a, select, input, textarea, th, td { font-style: normal !important; }
+
         /* [핵심] 헤더 디자인 고정 */
         header .text-3xl,
         header .nav-link,
         header button,
         header a {
-            font-family: 'Fredoka', sans-serif !important;
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
             font-weight: 800 !important;
             font-style: italic !important;
         }
@@ -76,12 +79,12 @@
             <div sec:authorize="isAuthenticated()">
                 <button onclick="location.href='/board/write'"
                         class="bg-[#FF8A5B] text-white px-10 py-4 rounded-full font-black shadow-lg hover:bg-[#e67a4d] transition-all italic uppercase active:scale-95">
-                    Write Post
+                    글쓰기
                 </button>
             </div>
             <div sec:authorize="isAnonymous()">
                 <p class="text-gray-400 font-bold italic bg-white px-6 py-3 rounded-full shadow-sm">
-                     <a href="/users/login" class="text-[#FF8A5B] no-underline hover:underline">로그인해서</a> 글을 작성해 보세요!
+                     <a href="/users/login" class="text-[#FF8A5B] no-underline hover:underline">로그인</a>해서 글을 작성해 보세요!
                 </p>
             </div>
         </div>

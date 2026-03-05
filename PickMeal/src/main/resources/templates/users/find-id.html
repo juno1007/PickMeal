@@ -6,54 +6,86 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Fredoka', sans-serif; background-color: #FFF5F0; }
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+        body {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            background-color: #FFF5F0;
+            margin: 0;
+
+            /* 기존 height: 100vh; 와 overflow: hidden; 을 아래 코드로 교체합니다 */
+            min-height: 100vh; /* 창 크기를 줄이면 자연스럽게 세로 스크롤바가 생성되도록 최소 높이만 보장 */
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden; /* 가로로 삐져나오는 것만 잘라내고, 세로 스크롤은 허용 */
+        }
         .card { border-radius: 3rem; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.05); }
         .input-field { border-radius: 1.2rem; border: 2px solid #FDF5E6; width: 100%; padding: 1rem 1.5rem; font-weight: 700; transition: all 0.3s; }
         .input-field:focus { outline: none; border-color: #FF8A5B; background-color: white; box-shadow: 0 0 0 4px rgba(255, 138, 91, 0.1); }
         .btn-submit { background-color: #FF8A5B; color: white; font-weight: 800; border-radius: 1.2rem; transition: all 0.3s; }
         .btn-submit:hover { background-color: #e67a4d; transform: translateY(-2px); }
 
-        /* 부드럽게 나타나는 애니메이션 */
-        .fade-in-up {
-            animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            font-style: normal !important;
         }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+       header .text-3xl,
+        header .nav-link,
+        header button,
+        header a,
+        .nav-link {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            font-weight: 800 !important;
+            font-style: italic !important;
+        }
+
+        /* 부드럽게 나타나는 애니메이션 */
+        .content-slide-up {
+            animation: slideUp 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+            will-change: transform, opacity;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
-<div class="card p-12 w-full max-w-md text-center border-2 border-gray-50">
-    <h2 class="text-4xl font-black text-[#FF8A5B] italic mb-6 uppercase tracking-tighter">ID 찾기</h2>
+</head>
 
-    <div class="space-y-4 text-left">
-        <div>
-            <label class="text-xs font-bold text-gray-400 ml-2 uppercase">Name</label>
-            <input type="text" id="userName" placeholder="가입하신 이름" class="input-field">
+<body>
+<header th:replace="~{fragments/header :: headerFragment}"></header>
+
+<main class="flex-grow flex items-start justify-center content-slide-up px-4 pt-32 pb-10">
+    <div class="card p-12 w-full max-w-md text-center border-2 border-gray-50">
+        <h2 class="text-4xl font-black text-[#FF8A5B] italic mb-6 uppercase tracking-tighter">ID 찾기</h2>
+
+        <div class="space-y-4 text-left">
+            <div>
+                <label class="text-xs font-bold text-gray-400 ml-2 uppercase">Name</label>
+                <input type="text" id="userName" placeholder="가입하신 이름" class="input-field">
+            </div>
+            <div>
+                <label class="text-xs font-bold text-gray-400 ml-2 uppercase">Email</label>
+                <input type="email" id="userEmail" placeholder="가입하신 이메일" class="input-field">
+            </div>
+            <button onclick="handleFindId()" class="btn-submit w-full py-4 mt-4 uppercase active:scale-95">찾기</button>
         </div>
-        <div>
-            <label class="text-xs font-bold text-gray-400 ml-2 uppercase">Email</label>
-            <input type="email" id="userEmail" placeholder="가입하신 이메일" class="input-field">
+
+        <div id="resultArea" class="hidden mt-8 p-6 bg-orange-50 rounded-3xl border-2 border-dashed border-[#FF8A5B]">
+            <p id="resultTitle" class="text-sm font-bold text-gray-500 mb-2">찾으시는 아이디는</p>
+            <p id="foundId" class="text-xl font-black text-[#FF8A5B] my-2 leading-tight"></p>
+
+            <div id="actionButtons" class="mt-4 pt-4 border-t border-orange-200 flex justify-center gap-4">
+                <a href="/users/login" class="text-xs font-bold text-gray-400 hover:text-[#FF8A5B] underline uppercase">로그인</a>
+                <a id="findPwBtn" href="/users/forgot-pw" class="hidden text-xs font-bold text-gray-400 hover:text-[#FF8A5B] underline uppercase">비밀번호 찾기</a>
+            </div>
         </div>
-        <button onclick="handleFindId()" class="btn-submit w-full py-4 mt-4 uppercase active:scale-95">찾기</button>
-    </div>
 
-    <div id="resultArea" class="hidden mt-8 p-6 bg-orange-50 rounded-3xl border-2 border-dashed border-[#FF8A5B]">
-        <p id="resultTitle" class="text-sm font-bold text-gray-500 mb-2">찾으시는 아이디는</p>
-        <p id="foundId" class="text-xl font-black text-[#FF8A5B] my-2 leading-tight"></p>
-
-        <div id="actionButtons" class="mt-4 pt-4 border-t border-orange-200 flex justify-center gap-4">
-            <a href="/users/login" class="text-xs font-bold text-gray-400 hover:text-[#FF8A5B] underline uppercase">로그인</a>
-            <a id="findPwBtn" href="/users/forgot-pw" class="hidden text-xs font-bold text-gray-400 hover:text-[#FF8A5B] underline uppercase">비밀번호 찾기</a>
+        <div class="mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest">
+            <a href="/users/login" class="hover:text-[#FF8A5B] transition">로그인으로 돌아가기</a>
         </div>
     </div>
-
-    <div class="mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest">
-        <a href="/users/login" class="hover:text-[#FF8A5B] transition">로그인으로 돌아가기</a>
-    </div>
-</div>
+</main>
 
 <script>
     async function handleFindId() {
@@ -77,7 +109,7 @@
                 const result = await response.text();
 
                 resultArea.classList.add('hidden');
-                resultArea.classList.remove('fade-in-up');
+                resultArea.classList.remove('content-slide-up');
 
                 if (result.startsWith("SOCIAL_")) {
                     const siteName = result.split("_")[1];
@@ -92,7 +124,7 @@
 
                 resultArea.classList.remove('hidden');
                 void resultArea.offsetWidth;
-                resultArea.classList.add('fade-in-up');
+                resultArea.classList.add('content-slide-up');
 
             } else if(response.status === 404) {
                 alert("일치하는 회원 정보가 없습니다. 😢");
@@ -103,5 +135,6 @@
         }
     }
 </script>
+<footer th:replace="~{fragments/footer :: footerFragment}"></footer>
 </body>
 </html>

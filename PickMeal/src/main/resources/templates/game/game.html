@@ -8,17 +8,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         body {
-            font-family: 'Fredoka', sans-serif;
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
             background-color: #FFF5F0;
             margin: 0;
-            overflow: hidden;
-            height: 100vh;
+            min-height: 100vh; /* 창이 작아져도 최소 높이를 유지하여 찌그러짐 방지 */
             display: flex;
             flex-direction: column;
+            overflow-x: hidden; /* 가로 스크롤만 숨기고 세로 스크롤은 자동 생성 허용 */
         }
+        h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select { font-style: normal !important; }
 
-        .nav-link { font-family: 'Fredoka', sans-serif; font-weight: 700; font-style: italic; }
+        .nav-link { font-family: 'Fredoka', 'Jua', sans-serif; font-weight: 700; font-style: italic; }
+        header, header *, .italic-text { font-style: italic !important; }
 
         /* [통일된 애니메이션] 콘텐츠 영역 전용 상승 효과 */
         .content-slide-up {

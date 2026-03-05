@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pick Meal - Edit Profile</title>
+  <title>Pick Meal - 내 프로필</title>
 
   <meta name="_csrf" th:content="${_csrf?.token}"/>
   <meta name="_csrf_header" th:content="${_csrf?.headerName}"/>
@@ -13,10 +13,17 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
 
   <style>
-    body { font-family: 'Fredoka', sans-serif; background-color: #FFF5F0; margin: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+    body { font-family: 'Fredoka', 'Jua', sans-serif; background-color: #FFF5F0; margin: 0; }
     .edit-card { border-radius: 3rem; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.05); border: 2px solid #FDF5E6; }
     .input-field { width: 100%; padding: 1rem 1.5rem; border-radius: 1.5rem; border: 2px solid #FFF5F0; background-color: #FDFDFD; font-weight: 800; color: #444; transition: all 0.3s ease; font-size: 1.15rem; }
 
+h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            font-style: normal !important;
+        }
+
+        header, footer { z-index: 1200 !important; position: relative; }
     /* [수정] 입력 시 주황색 그림자 효과 */
     .input-field:focus { outline: none; border-color: #FF8A5B; background-color: white; box-shadow: 0 0 0 4px rgba(255, 138, 91, 0.1); }
 
@@ -117,7 +124,7 @@
       </div>
 
       <div class="edit-card p-12 bg-[#FF8A5B]/2 space-y-10">
-        <h3 class="text-3xl font-black text-[#FF8A5B] italic uppercase tracking-tight">Taste Preference</h3>
+        <h3 class="text-3xl font-black text-[#FF8A5B] italic uppercase tracking-tight">음식 취향</h3>
         <div>
           <label class="label-text text-blue-400">좋아하는 음식 ❤️</label>
           <input type="text" th:field="*{likeMenu}" class="input-field" placeholder="쉼표로 구분해 입력해주세요.">
@@ -130,8 +137,8 @@
     </div>
 
     <div class="mt-16 flex justify-center gap-6">
-      <button type="submit" class="px-12 py-5 bg-[#FF8A5B] text-white rounded-full font-black text-xl shadow-xl hover:bg-[#e67a4d] hover:scale-105 transition-all italic uppercase">Save Changes</button>
-      <a th:href="@{/users/mypage}" class="px-12 py-5 bg-slate-200 text-slate-500 rounded-full font-black text-xl hover:bg-red-50 hover:text-red-500 transition-all italic uppercase">Cancel</a>
+      <button type="submit" class="px-12 py-5 bg-[#FF8A5B] text-white rounded-full font-black text-xl shadow-xl hover:bg-[#e67a4d] hover:scale-105 transition-all italic uppercase">정보 저장</button>
+      <a th:href="@{/users/mypage}" class="px-12 py-5 bg-slate-200 text-slate-500 rounded-full font-black text-xl hover:bg-red-50 hover:text-red-500 transition-all italic uppercase">취소</a>
     </div>
   </form>
 </main>
@@ -281,4 +288,5 @@
   function validateEditForm() { if(!isNicknameValid) { alert("닉네임 중복 확인이 필요합니다."); return false; } return true; }
 </script>
 </body>
+<footer th:replace="~{fragments/footer :: footerFragment}"></footer>
 </html>

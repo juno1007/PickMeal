@@ -8,6 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         /* [교정] 헤더 및 폰트 스타일 통일 */
         header, header *, .nav-link, .italic-text {
             font-family: 'Fredoka', sans-serif !important;
@@ -15,7 +16,12 @@
             font-style: italic !important;
         }
         header, footer { z-index: 1200 !important; position: relative; }
-        body { font-family: 'Fredoka', sans-serif; background-color: #FAF3F0; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { font-family: 'Fredoka', 'Jua', sans-serif; background-color: #FAF3F0; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            font-style: normal !important;
+        }
 
         /* [교정] 메인 컨테이너 규격 통일 (시작 높이 100px) */
         .gacha-main-content {

@@ -20,8 +20,9 @@
 
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         body {
-            font-family: 'Fredoka', sans-serif;
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
             background-color: #FFF5F0;
             margin: 0;
             overflow: hidden;
@@ -30,7 +31,12 @@
             flex-direction: column;
         }
 
-        .nav-link { font-family: 'Fredoka', sans-serif; font-weight: 700; font-style: italic; }
+        h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            font-style: normal !important;
+        }
+
+        .nav-link { font-family: 'Fredoka', 'Jua', sans-serif; font-weight: 700; font-style: italic; }
 
         .content-slide-up {
             animation: slideUp 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
@@ -91,6 +97,8 @@
         border: none !important;
         box-shadow: none !important;
     }
+
+    header, header *, .italic-text { font-style: italic !important; }
 
     /* 툴바 영역 배경색과 둥근 테두리 설정 (기존 디자인 유지) */
     .note-toolbar {
@@ -169,7 +177,7 @@
     /* Placeholder 스타일 */
     .note-placeholder {
         color: #ccc !important;
-        font-family: 'Fredoka', sans-serif !important;
+        font-family: 'Fredoka', 'Jua', sans-serif !important;
         font-weight: bold !important;
         padding: 2rem !important;
         font-size: 20px !important;
@@ -197,8 +205,8 @@
     <main class="flex items-center justify-center content-slide-up py-10">
         <div class="write-card p-12 w-full max-w-4xl mx-4 border-2 border-gray-50">
             <div class="mb-8 text-center md:text-left">
-                <h2 class="text-4xl font-black text-[#FF8A5B] italic uppercase tracking-tighter">Edit Post</h2>
-                <p class="text-gray-400 font-bold italic">Modify your tasty experiences!</p>
+                <h2 class="text-4xl font-black text-[#FF8A5B] italic uppercase tracking-tighter">새 게시물</h2>
+                <p class="text-gray-400 font-bold italic">자신만의 스타일로 취향을 표현하세요!</p>
             </div>
 
             <form id="editForm" th:action="@{/board/edit/{boardId}(boardId=${board.boardId})}" method="post" enctype="multipart/form-data" class="space-y-6">
@@ -238,7 +246,7 @@
         $('#postContent').summernote({
             height: 500,                 // 에디터 높이
             lang: "ko-KR",               // 한글 설정
-            placeholder: '당신의 맛있는 경험을 자유롭게 적어주세요! 🍕',
+            placeholder: '당신의 맛있는 경험을 자유롭게 적어주세요!',
             disableResizeEditor: true,   // 크기 조절 바 숨기기
 
             dialogsInBody: true,

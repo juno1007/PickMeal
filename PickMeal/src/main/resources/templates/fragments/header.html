@@ -4,23 +4,23 @@
     <meta charset="UTF-8">
 </head>
 <body>
-<header th:fragment="headerFragment" class="fixed top-0 left-0 w-full z-50 px-10 py-6 grid grid-cols-3 items-center bg-white/80 backdrop-blur-md border-b border-gray-100">
+<header th:fragment="headerFragment" class="fixed top-0 left-0 w-full z-50 px-10 py-6 flex justify-between lg:grid lg:grid-cols-3 items-center bg-white/80 backdrop-blur-md border-b border-gray-100">
     <div class="flex justify-start">
         <a href="/next-page" class="text-3xl font-black text-[#FF8A5B] italic tracking-tighter uppercase select-none">Pick Meal</a>
     </div>
 
-    <nav class="flex justify-center items-center gap-10">
-        <a href="/hotplace" class="nav-link text-lg text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">맛집</a>
-        <a href="/meal-spotter" class="nav-link text-lg text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">핫플레이스</a>
-        <a href="/game" class="nav-link text-lg text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">게임</a>
-        <a href="/board/list" class="nav-link text-lg text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">게시판</a>
+    <nav class="hidden lg:flex justify-center items-center gap-10">
+        <a href="/hotplace" class="nav-link text-lg text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">PLACE</a>
+        <a href="/meal-spotter" class="nav-link text-lg text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">HOT PLACE</a>
+        <a href="/game" class="nav-link text-lg text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">GAME</a>
+        <a href="/board/list" class="nav-link text-lg text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">BOARD</a>
     </nav>
 
-    <div class="flex justify-end items-center gap-8">
+    <div class="hidden md:flex justify-end items-center gap-8">
 
         <th:block th:if="${#authorization.expression('isAnonymous()') or #authorization.expression('hasRole(''ROLE_GUEST'')')}">
-            <a href="/users/login" class="nav-link text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">로그인</a>
-            <a href="/users/signup" class="nav-link bg-[#FF8A5B] text-white px-6 py-2 rounded-full shadow-md hover:bg-[#ff7a45] transition font-bold whitespace-nowrap">회원가입</a>
+            <a href="/users/login" class="nav-link text-gray-800 hover:text-[#FF8A5B] transition font-bold whitespace-nowrap">LOGIN</a>
+            <a href="/users/signup" class="nav-link bg-[#FF8A5B] text-white px-6 py-2 rounded-full shadow-md hover:bg-[#ff7a45] transition font-bold whitespace-nowrap">SIGN UP</a>
         </th:block>
 
         <th:block th:if="${#authorization.expression('hasRole(''ROLE_USER'')') or #authorization.expression('hasRole(''ROLE_ADMIN'')')}">

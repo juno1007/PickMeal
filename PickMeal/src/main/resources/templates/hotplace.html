@@ -8,9 +8,30 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Fredoka', sans-serif; background-color: #fff; margin: 0; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+       body {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            background-color: #fff;
+            margin: 0;
+            min-height: 100vh; /* 창이 작아져도 최소 높이를 유지하여 찌그러짐 방지 */
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden; /* 가로 스크롤만 숨기고 세로 스크롤은 자동 생성 허용 */
+        }
+        h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select { font-style: normal !important; }
         header, header *, .italic-text { font-style: italic !important; }
-        .main-container { flex-grow: 1; display: flex; margin-top: 80px; overflow: hidden; height: calc(100vh - 140px); }
+        .main-container {
+            display: flex;
+            margin-top: 85px;
+            overflow: hidden; /* 좌측 맛집 리스트의 내부 스크롤을 유지하기 위해 필수 */
+
+            /* 화면이 클 때: 푸터를 맨 아래로 딱 맞게 밀어내는 높이 계산식 */
+            height: calc(100vh - 190px);
+
+            /* [핵심 해결책] 화면이 작을 때: 컨테이너가 600px 이하로 찌그러지는 것을 방어!
+               창 높이가 이보다 작아지면 지도는 600px 크기를 유지하고, 비로소 화면 전체에 세로 스크롤바가 생깁니다. */
+            min-height: 600px;
+        }
         .side-panel { width: 380px; background: white; border-right: 1px solid #eee; display: flex; flex-direction: column; z-index: 10; height: 100%; }
         .filter-header-section { padding: 12px 18px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #f5f5f5; }
 
@@ -103,8 +124,8 @@
 <div class="main-container">
     <aside class="side-panel">
         <div class="filter-header-section">
-            <div class="location-badge" id="btn-area-open"><span id="display-area">📍 지역을 선택하세요</span></div>
-            <div class="location-badge food-badge" id="btn-food-open"><span id="display-food">🍴 음식 종류 선택</span></div>
+            <div class="location-badge" id="btn-area-open"><span id="display-area">지역을 선택하세요</span></div>
+            <div class="location-badge food-badge" id="btn-food-open"><span id="display-food">음식 종류 선택</span></div>
 
             <div class="relative mt-2 flex items-center gap-2">
                 <div class="relative flex-grow">
@@ -519,14 +540,14 @@
 
     function resetRegionFilter() {
         currentSelection.sido = null; currentSelection.sigugun = null; currentSelection.dong = null;
-        document.getElementById('display-area').innerText = "📍 지역을 선택하세요";
+        document.getElementById('display-area').innerText = "지역을 선택하세요";
         document.getElementById('sigugunList').innerHTML = ''; document.getElementById('dongList').innerHTML = '';
         closeAll(); updateSearch();
     }
 
     function resetFoodFilter() {
         currentSelection.foodName = null;
-        document.getElementById('display-food').innerText = "🍴 음식 종류 선택";
+        document.getElementById('display-food').innerText = "음식 종류 선택";
         document.getElementById('foodNameList').innerHTML = '';
         closeAll(); updateSearch();
     }

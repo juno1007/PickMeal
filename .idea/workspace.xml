@@ -4,19 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d5434541-224c-465f-accd-78c92f7f54c4" name="변경" comment="26.03.04 1110 재민 코드 병합">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25___4_58__________.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25___5_14__________.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25___5_15__________.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25___9_09__________.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25__오전_9_09,_체크아웃_전에_커밋되지_않은_변경_내용_[변경]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25__오후_4_58,_체크아웃_전에_커밋되지_않은_변경_내용_[변경]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25__오후_5_14,_체크아웃_전에_커밋되지_않은_변경_내용_[변경]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__25__오후_5_15,_체크아웃_전에_커밋되지_않은_변경_내용_[변경]/shelved.patch" beforeDir="false" />
+    <list default="true" id="d5434541-224c-465f-accd-78c92f7f54c4" name="변경" comment="26.02.26 재민 병합 코드">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/java/PickMeal/PickMeal/controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/java/PickMeal/PickMeal/controller/MainController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/java/PickMeal/PickMeal/controller/RestaurantController.java" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/java/PickMeal/PickMeal/controller/RestaurantController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/board-detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/board-detail.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/board-edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/board-edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/board-write.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/board-write.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/board.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/board.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/meal-spotter.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/meal-spotter.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/fragments/footer.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/fragments/footer.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/fragments/header.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/fragments/header.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/capsule.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/capsule.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/game.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/game.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/game_setup.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/game_setup.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/ranking.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/ranking.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/roulette.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/roulette.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/twentyQuestions.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/twentyQuestions.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/worldcup.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/game/worldcup.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/hotplace.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/hotplace.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/next-page.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/next-page.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/edit.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/edit.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/find-id.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/find-id.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/forgot-pw.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/forgot-pw.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/mypage.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/mypage.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/reset-password-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/reset-password-form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/signup.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/signup.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +36,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -48,6 +65,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.PickMealApplication.executor": "Run",
     "git-widget-placeholder": "jaemin",
@@ -71,6 +89,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Spring Boot.PickMealApplication" />
         <item itemvalue="Spring Boot.PickMealApplication" />
       </list>
     </recent_temporary>

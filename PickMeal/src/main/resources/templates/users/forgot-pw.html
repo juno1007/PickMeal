@@ -7,17 +7,35 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
     body {
-        font-family: 'Fredoka', sans-serif;
-        background-color: #FFF5F0;
-        margin: 0;
-        overflow: hidden;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-    }
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            background-color: #FFF5F0;
+            margin: 0;
 
-    .nav-link { font-family: 'Fredoka', sans-serif; font-weight: 700; font-style: italic; }
+            /* 기존 height: 100vh; 와 overflow: hidden; 을 아래 코드로 교체합니다 */
+            min-height: 100vh; /* 창 크기를 줄이면 자연스럽게 세로 스크롤바가 생성되도록 최소 높이만 보장 */
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden; /* 가로로 삐져나오는 것만 잘라내고, 세로 스크롤은 허용 */
+        }
+
+    h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            font-style: normal !important;
+        }
+
+       header .text-3xl,
+        header .nav-link,
+        header button,
+        header a,
+        .nav-link {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            font-weight: 800 !important;
+            font-style: italic !important;
+        }
+
+    .nav-link { font-family: 'Fredoka', 'Jua', sans-serif; font-weight: 700; font-style: italic; }
 
     /* [통일된 애니메이션] 콘텐츠 영역 전용 상승 효과 */
     .content-slide-up {
@@ -52,9 +70,9 @@
 <body>
 <header th:replace="~{fragments/header :: headerFragment}"></header>
 
-<main class="flex-grow flex items-center justify-center content-slide-up">
+<main class="flex-grow flex items-start justify-center content-slide-up px-4 pt-32 pb-10">
   <div class="forgot-card p-12 w-full max-w-lg text-center mx-4 border-2 border-gray-50">
-    <h2 class="text-4xl font-black text-[#FF8A5B] italic mb-2 uppercase tracking-tighter">비밀번호 초기화</h2>
+    <h2 class="text-4xl font-black text-[#FF8A5B] italic mb-2 uppercase tracking-tighter">비밀번호 찾기</h2>
     <p class="text-gray-400 font-bold mb-10 italic">당신의 ID와 EMAIL을 입력해주세요</p>
 
     <form id="forgotForm" class="space-y-6 text-left">
@@ -67,17 +85,16 @@
         <label class="font-black text-gray-700 italic ml-2 uppercase text-sm">이메일 인증</label>
         <div class="flex gap-2">
           <input type="email" id="userEmail" placeholder="EMAIL" class="input-field px-6 py-4 bg-gray-50 font-bold" required>
-          <button type="button" onclick="verifyEmail()" class="btn-check shadow-sm uppercase text-xs">발송</button>
         </div>
       </div>
 
       <button type="submit" class="btn-primary w-full text-white py-5 rounded-full font-black text-xl shadow-lg transition italic uppercase active:scale-95 mt-4">
-        초기화 링크 보내기
+        링크 보내기
       </button>
     </form>
 
     <div class="mt-8 text-sm font-bold text-gray-400 italic">
-      비밀번호가 기억나신가요?
+      비밀번호가 기억나셨나요?
       <a href="/login" class="text-[#FF8A5B] hover:underline ml-1">로그인으로 돌아가기</a>
     </div>
   </div>
@@ -129,5 +146,6 @@
       }
   }
 </script>
+<footer th:replace="~{fragments/footer :: footerFragment}"></footer>
 </body>
 </html>

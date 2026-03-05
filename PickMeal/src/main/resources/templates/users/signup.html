@@ -9,7 +9,13 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Fredoka', sans-serif; background-color: #FFF5F0; margin: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+    body { font-family: 'Fredoka', 'Jua', sans-serif; background-color: #FFF5F0; margin: 0; }
+
+    h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea {
+            font-family: 'Fredoka', 'Jua', sans-serif !important;
+            font-style: normal !important;
+        }
     .signup-card { border-radius: 3rem; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.1); }
     .input-field { border-radius: 1.2rem; transition: all 0.3s; border: 2px solid #FDF5E6; width: 100%; font-weight: 700; color: #1F2937; background-color: #ffffff; font-size: 0.9rem; padding: 0.75rem 1.25rem; }
     .input-field:focus { border-color: #FF8A5B; outline: none; background-color: #ffffff; box-shadow: 0 0 0 4px rgba(255, 138, 91, 0.1); }
@@ -51,8 +57,11 @@
     .pw-toggle { position: absolute; right: 1.25rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #9CA3AF; transition: color 0.3s; }
   </style>
 </head>
-<body class="py-20">
-<main class="flex items-center justify-center px-4">
+
+<body class="min-h-screen flex flex-col">
+<header th:replace="~{fragments/header :: headerFragment}"></header>
+
+<main class="flex-grow flex items-start justify-center px-4 pt-32 pb-10">
   <div class="signup-card p-12 w-full max-w-2xl text-center border-2 border-gray-50">
     <h2 class="text-4xl font-black text-[#FF8A5B] italic mb-2 uppercase tracking-tighter">회원 가입</h2>
     <p class="text-gray-400 font-bold mb-10 italic">당신의 정보를 더 알려주세요!</p>
@@ -141,7 +150,7 @@
         </div>
       </div>
 
-      <button type="submit" class="bg-[#FF8A5B] md:col-span-2 text-white py-5 rounded-full font-black text-xl shadow-lg transition italic uppercase active:scale-95 mt-4">가입을 환영합니다!</button>
+      <button type="submit" class="bg-[#FF8A5B] md:col-span-2 text-white py-5 rounded-full font-black text-xl shadow-lg transition italic uppercase active:scale-95 mt-4">가입을 환영합니다</button>
     </form>
   </div>
 </main>
@@ -315,5 +324,6 @@
       return true;
   }
 </script>
+<footer th:replace="~{fragments/footer :: footerFragment}"></footer>
 </body>
 </html>

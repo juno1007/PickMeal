@@ -11,9 +11,10 @@
     <link rel="icon" type="image/png" th:href="@{/images/pickmeal_favicon2.png}">
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         /* 1. body를 flex 구조로 만들고 최소 높이를 화면 전체(100vh)로 설정 */
         body {
-            font-family: 'Fredoka', sans-serif;
+            font-family: 'Fredoka', 'Jua', sans-serif;
             background-color: #FDF5E6;
             margin: 0;
             cursor: default;
@@ -21,8 +22,13 @@
             flex-direction: column;
             min-height: 100vh;
         }
-        .nav-link { font-family: 'Fredoka', sans-serif; font-weight: 700; font-style: italic; }
-        .section-title { font-family: 'Fredoka', sans-serif; font-weight: 800; font-style: italic; letter-spacing: -2px; color: #1a1a1a; }
+
+        h1, h2, h3, h4, h5, h6, p, span, div, button, a {
+            font-style: normal !important;
+        }
+
+        .nav-link { font-family: 'Fredoka', 'Jua', sans-serif; font-weight: 700; font-style: italic; }
+        .section-title { font-family: 'Fredoka', 'Jua', sans-serif; font-weight: 800; font-style: italic; letter-spacing: -2px; color: #1a1a1a; }
         .swiper-container-wrapper { position: relative; padding: 0 50px; max-width: 1400px; margin: 0 auto; }
         .swiper { width: 100%; padding-bottom: 60px !important; padding-top: 20px !important; }
         .food-card { transition: all 0.3s ease; height: 100%; cursor: pointer; border-radius: 3rem; }
@@ -32,6 +38,7 @@
         .ani-btn.animate { animation: heart-pop 0.4s ease-out; }
         @keyframes heart-pop { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
         .heart-count-text { color: #444; font-size: 13px; font-weight: 700; }
+        header, header *, .italic-text { font-style: italic !important; }
     </style>
 </head>
 <body>
