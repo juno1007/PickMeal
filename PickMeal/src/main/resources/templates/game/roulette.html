@@ -77,7 +77,10 @@
       <div id="item-list" class="space-y-3 mb-6 max-h-[300px] overflow-y-auto pr-2 scroller">
       </div>
       <div class="flex gap-2">
-        <input type="text" id="new-item" placeholder="음식을 입력해주세요..." class="input-field flex-grow px-4 py-3 font-bold" onkeypress="if(event.keyCode==13) addItem()">
+        <input type="text" id="new-item" list="food-options" placeholder="음식을 입력해주세요..." class="input-field flex-grow px-4 py-3 font-bold" onkeypress="if(event.keyCode==13) addItem()">
+
+        <datalist id="food-options"></datalist>
+
         <button onclick="addItem()" class="bg-[#4CAF50] text-white px-6 py-3 rounded-2xl font-black shadow-md hover:bg-[#43a047] transition">+</button>
       </div>
       <p class="text-gray-400 mt-4 text-sm font-bold italic text-center">Min 2, Max 12 items recommended!</p>
@@ -90,9 +93,44 @@
 <script th:inline="javascript">
   const canvas = document.getElementById("canvas");
   const ctx = canvas.getContext("2d");
-  let items = ["수제버거", "보쌈", "짜장면", "타코"];
+  let items = ["짜장면", "김치찌개", "규동", "타코"];
   const colors = ["#FF8A5B", "#4CAF50", "#FFD93D", "#6BCB77", "#4D96FF", "#FF6B6B", "#9575CD", "#4DB6AC"];
 
+  // 133개 음식 사전 (여기에 싹 몰아넣었습니다)
+  const foodMasterList = [
+      "갈비찜", "감자탕", "곱창전골", "김치찌개", "냉면", "닭볶음탕", "된장찌개", "떡볶이", "보쌈", "부대찌개",
+      "불고기", "비빔밥", "삼겹살", "삼계탕", "설렁탕", "소머리국밥", "순대국밥", "순대볶음", "순두부찌개", "육개장",
+      "제육볶음", "족발", "칼국수", "해물파전", "고추잡채", "군만두", "깐풍기", "꿔바로우", "난자완스", "딤섬",
+      "라조기", "마라탕", "마파두부", "볶음밥", "북경오리구이", "사천탕수육", "양꼬치", "유린기", "유산슬", "잡채밥",
+      "짜장면", "짬뽕", "칠리새우", "탄탄면", "탕수육", "탕후루", "팔보채", "가츠동", "규동", "나베",
+      "덴푸라", "돈카츠", "돈코츠라멘", "라멘", "마제소바", "메밀소바", "모츠나베", "몬자야키", "사케동", "샤브샤브",
+      "소유라멘", "스시", "스키야키", "야키소바", "야키토리", "에비후라이", "오니기리", "오코노미야키", "우동", "치킨가라아게",
+      "카레라이스", "카이센동", "타코야키", "텐동", "회덮밥", "후토마키", "감바스", "고르곤졸라피자", "까르보나라", "뇨끼",
+      "라자냐", "로제파스타", "마르게리따피자", "미트볼스파게티", "바비큐폭립", "봉골레파스타", "부리또", "비프스튜", "샌드위치", "수제버거",
+      "슈바인학센", "스프", "시카고피자", "안심스테이크", "알리오올리오", "양갈비스테이크", "잠봉뵈르", "칠리콘카르네", "퀘사디아", "타코",
+      "토마토파스타", "투움바파스타", "티본스테이크", "페퍼로니피자", "포테이토피자", "프렌치토스트", "피쉬앤칩스", "하와이안피자", "함박스테이크", "화이트라구파스타",
+      "스프링롤", "나시고랭", "똠양꿍", "랭쌥", "미고랭", "반미", "반쎄오", "분짜", "사모사", "샤슬릭",
+      "쌀국수", "아목", "월남쌈", "인도커리&난", "짜조", "칠리크랩", "카오카무", "카오팟", "케밥", "탄두리치킨",
+      "팟타이", "푸팟퐁커리", "허르헉"
+  ];
+
+  // [중복 해결 버전] 딱 한 번만 깔끔하게 메뉴를 채우는 코드입니다.
+  function setupAutocomplete() {
+      const datalist = document.getElementById('food-options');
+      if (datalist) {
+          datalist.innerHTML = ""; // 칠판을 먼저 깨끗이 지우기 (중복 방지!)
+          foodMasterList.forEach(food => {
+              const option = document.createElement('option');
+              option.value = food;
+              datalist.appendChild(option);
+          });
+      }
+  }
+
+  // 페이지가 로딩되면 이 일꾼을 딱 한 번만 부릅니다.
+  window.addEventListener('load', setupAutocomplete);
+
+  // 룰렛 회전 관련 변수 (원래 있던 것들)
   let isSpinning = false;
   let currentRotation = 0;
 
@@ -132,13 +170,18 @@
   }
 
   function addItem() {
-      const input = document.getElementById("new-item");
-      if (input.value.trim() && items.length < 12) {
-          items.push(input.value.trim());
-          input.value = "";
-          updateList();
-      }
-  }
+    const input = document.getElementById("new-item");
+    let val = input.value.trim(); // 사용자가 입력창에 쓴 글자 (예: "치킨")
+
+    if (val && items.length < 12) {
+        // ✨ [수정] 복잡한 매칭 로직을 다 지우고, 사용자가 입력한 val을 그대로 넣습니다!
+        const finalItem = val;
+
+        items.push(finalItem); // 룰렛 배열에 "치킨" 그대로 추가
+        input.value = "";      // 입력창 비우기
+        updateList();          // 룰렛판 다시 그리기
+    }
+}
 
   function removeItem(index) {
       if (items.length > 2) {

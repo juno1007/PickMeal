@@ -196,7 +196,9 @@
 
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=24546b16104e0273c6d8c5c4cc508b44&libraries=services"></script>
 <script th:inline="javascript">
-    var map = new kakao.maps.Map(document.getElementById('map'), { center: new kakao.maps.LatLng(37.4980, 127.0276), level: 3 });
+    var mapContainer = document.getElementById('map');
+    var map; // 지도를 담을 상자만 미리 만들어둡니다.
+
     var ps = new kakao.maps.services.Places();
     var geocoder = new kakao.maps.services.Geocoder();
     var currentOverlays = [];
@@ -582,7 +584,36 @@
         if (list) Array.from(list.children).forEach(li => li.classList.remove('active-item'));
     }
 
-    window.onload = () => { ps.keywordSearch('맛집', renderPlaces); };
+    window.onload = () => {
+    if (navigator.geolocation) {
+        // [흐름 1] 브라우저에게 "지금 어디야?"라고 물어봅니다. (Request)
+        navigator.geolocation.getCurrentPosition(function(position) {
+            // ✅ [성공] 브라우저가 실제 좌표를 알려준 경우
+            var lat = position.coords.latitude;  // 위도
+            var lon = position.coords.longitude; // 경도
+            var locPosition = new kakao.maps.LatLng(lat, lon);
+
+            // 실제 내 위치를 중심으로 지도를 만듭니다.
+            map = new kakao.maps.Map(mapContainer, { center: locPosition, level: 3 });
+
+            // 내 주변 2km 이내의 맛집을 검색합니다.
+            ps.keywordSearch('맛집', renderPlaces, { location: locPosition, radius: 2000 });
+
+            console.log("✅ 실제 위치를 잡았습니다: ", lat, lon);
+        }, function(error) {
+            // ❌ [실패] 장치 문제로 위치를 못 잡을 경우 (Fallback)
+            var defaultLat = 37.4902; // 위도
+            var defaultLon = 126.9275; // 경도
+            var defaultPosition = new kakao.maps.LatLng(defaultLat, defaultLon);
+
+            map = new kakao.maps.Map(mapContainer, { center: defaultPosition, level: 3 });
+            ps.keywordSearch('맛집', renderPlaces, { location: defaultPosition, radius: 2000 });
+
+            console.warn("⚠️ 위치를 잡을 수 없어 설정된 기본 위치를 보여줍니다.");
+        });
+    }
+};
+
     btnSearch.onclick = () => updateSearch();
     keywordInput.onkeypress = (e) => { if (e.key === 'Enter') updateSearch(); };
 </script>

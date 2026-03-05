@@ -4,6 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="d5434541-224c-465f-accd-78c92f7f54c4" name="변경" comment="26.02.26 재민 병합 코드">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/board-detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/board/board-detail.html" afterDir="false" />
@@ -29,6 +30,14 @@
       <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/mypage.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/mypage.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/reset-password-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/reset-password-form.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/signup.html" beforeDir="false" afterPath="$PROJECT_DIR$/PickMeal/src/main/resources/templates/users/signup.html" afterDir="false" />
+=======
+    <list default="true" id="d5434541-224c-465f-accd-78c92f7f54c4" name="변경" comment="26.03.04 1110 재민 코드 병합">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__26___9_02__________.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/26__2__26__오전_9_02,_체크아웃_전에_커밋되지_않은_변경_내용_[변경]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+>>>>>>> origin/junho
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,7 +61,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/dlive838-maker/PickMeal.git&quot;,
-    &quot;accountId&quot;: &quot;04b0600f-f63c-406a-b753-1f5c3038be60&quot;
+    &quot;accountId&quot;: &quot;453e9330-37b0-4881-b769-ab3dfe353017&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -65,10 +74,14 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+<<<<<<< HEAD
+=======
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+>>>>>>> origin/junho
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Spring Boot.PickMealApplication.executor": "Run",
-    "git-widget-placeholder": "jaemin",
+    "git-widget-placeholder": "junho",
     "kotlin-language-version-configured": "true"
   }
 }]]></component>

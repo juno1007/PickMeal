@@ -10,10 +10,13 @@
         <module name="PickMeal" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="pickmeal" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="PickMeal" options="-parameters" />
+      <module name="PickMeal" options="" />
     </option>
   </component>
 </project>

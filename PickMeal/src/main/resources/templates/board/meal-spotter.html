@@ -206,7 +206,13 @@
 
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=24546b16104e0273c6d8c5c4cc508b44&libraries=services"></script>
 <script th:inline="javascript">
-    var map = new kakao.maps.Map(document.getElementById('map'), { center: new kakao.maps.LatLng(37.4980, 127.0276), level: 3 });
+    var mapContainer = document.getElementById('map');
+    var mapOption = {
+    center: new kakao.maps.LatLng(37.4902, 126.9275),
+    level: 3
+    };
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+
     var ps = new kakao.maps.services.Places();
     var geocoder = new kakao.maps.services.Geocoder();
     var currentOverlays = [];
@@ -632,6 +638,16 @@ function renderCustomPagination() {
     }
 
     window.onload = async () => {
+        // ✨ [추가] 접속하자마자 내 주변 지도로 이동시키는 '내비게이션' 역할
+        if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var lat = position.coords.latitude; // 위도(Latitude)
+            var lon = position.coords.longitude; // 경도(Longitude)
+            var locPosition = new kakao.maps.LatLng(lat, lon);
+
+            map.setCenter(locPosition); // 맵의 중심을 내 위치로 이동!
+        });
+    }
         // 백엔드에서 보내준 핫스팟(하트 10개 이상) 데이터
         const dbHotSpots = /*[[${popularPlaceList}]]*/ [];
 
