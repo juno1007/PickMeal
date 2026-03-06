@@ -18,6 +18,7 @@
         <result property="joinDate" column="joinDate" />
         <result property="role" column="role" />
         <result property="status" column="status" />
+        <result property="suspensionEndDate" column="suspension_end_date" />
         <result property="socialLoginSite" column="socialLoginSite" />
         <result property="socialId" column="socialId" />
     </resultMap>

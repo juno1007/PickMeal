@@ -371,7 +371,7 @@ public class UserController {
                 org.springframework.security.core.context.SecurityContextHolder.clearContext();
 
                 rttr.addFlashAttribute("msg", "회원 탈퇴가 정상적으로 처리되었습니다.");
-                return "redirect:/?msg=withdrawn";
+                return "redirect:/";
             } else {
                 rttr.addFlashAttribute("msg", "유저 정보를 찾을 수 없어 탈퇴에 실패했습니다.");
             }

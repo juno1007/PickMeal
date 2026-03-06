@@ -343,11 +343,14 @@ public class UserService implements UserDetailsService {
     public void suspendUser(Long user_id, int suspendDays) {
         User user = userMapper.findByUser_id(user_id);
         if(user != null) {
-            // 현재 시간에 정지 일수를 더함 (9999일이면 영구정지로 간주)
-            LocalDateTime endDate = LocalDateTime.now().plusDays(suspendDays);
+            // 🚩 수정: 9999일 이상이면 영구 정지로 판단하여 null을 넣고, 아니면 날짜를 계산함
+            LocalDateTime endDate = null;
+            if (suspendDays < 9999) {
+                endDate = LocalDateTime.now().plusDays(suspendDays);
+            }
 
             user.setStatus("SUSPENDED");
-            user.setSuspensionEndDate(endDate);
+            user.setSuspensionEndDate(endDate); // 영구 정지면 null이 들어감
             userMapper.updateUserSuspension(user);
         }
     }
