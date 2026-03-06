@@ -18,24 +18,14 @@
     .edit-card { border-radius: 3rem; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.05); border: 2px solid #FDF5E6; }
     .input-field { width: 100%; padding: 1rem 1.5rem; border-radius: 1.5rem; border: 2px solid #FFF5F0; background-color: #FDFDFD; font-weight: 800; color: #444; transition: all 0.3s ease; font-size: 1.15rem; }
 
-h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea {
-            font-family: 'Fredoka', 'Jua', sans-serif !important;
-            font-style: normal !important;
-        }
-
-        header, footer { z-index: 1200 !important; position: relative; }
-    /* [수정] 입력 시 주황색 그림자 효과 */
-    .input-field:focus { outline: none; border-color: #FF8A5B; background-color: white; box-shadow: 0 0 0 4px rgba(255, 138, 91, 0.1); }
-
-    /* [수정] 읽기 전용 필드 - 그림자와 주황색 테두리 원천 차단 */
-    .input-readonly {
-        background-color: #f3f4f6 !important;
-        color: #9ca3af !important;
-        border: 2px solid #e5e7eb !important;
-        cursor: not-allowed !important;
-        box-shadow: none !important; /* 주황색 그림자 제거 핵심 코드 */
+    h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea {
+        font-family: 'Fredoka', 'Jua', sans-serif !important;
+        font-style: normal !important;
     }
 
+    header, footer { z-index: 1200 !important; position: relative; }
+    .input-field:focus { outline: none; border-color: #FF8A5B; background-color: white; box-shadow: 0 0 0 4px rgba(255, 138, 91, 0.1); }
+    .input-readonly { background-color: #f3f4f6 !important; color: #9ca3af !important; border: 2px solid #e5e7eb !important; cursor: not-allowed !important; box-shadow: none !important; }
     .label-text { color: #FFB08E; font-size: 0.85rem; font-weight: 800; margin-left: 1rem; margin-bottom: 0.2rem; display: block; }
     .btn-action { padding: 0 1.5rem; height: 3.8rem; border-radius: 1.5rem; background-color: #FF8A5B; color: white; font-weight: 800; transition: all 0.3s ease; white-space: nowrap; }
     .btn-action:hover:not(:disabled) { background-color: #e67a4d; transform: scale(1.02); }
@@ -46,22 +36,32 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea 
     .modal-overlay.active { display: flex; opacity: 1; }
     .modal-card { background: white; width: 90%; max-width: 500px; border-radius: 2.5rem; padding: 2.5rem; transform: translateY(20px); transition: transform 0.3s ease; }
     .modal-overlay.active .modal-card { transform: translateY(0); }
-
     .phone-group { display: flex; align-items: center; gap: 0.5rem; }
     .pw-wrapper { position: relative; width: 100%; }
     .pw-toggle { position: absolute; right: 1.25rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: #9CA3AF; z-index: 10; }
     .content-slide-up { animation: slideUp 0.8s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
     @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    input::-webkit-calendar-picker-indicator { display: none !important; }
+    input::-ms-expand { display: none; }
 
-    /* Chrome, Safari, Edge용 */
-    input::-webkit-calendar-picker-indicator {
-    display: none !important;
+    /* =======================================================
+       🌟 수제 메뉴판(Custom Dropdown)을 예쁘게 꾸미는 CSS(디자인)
+       ======================================================= */
+    .input-wrapper { position: relative; width: 100%; }
+    .custom-dropdown {
+        position: absolute; top: 100%; left: 0; right: 0;
+        background: white; border: 2px solid #FF8A5B; border-radius: 1.5rem;
+        max-height: 250px; overflow-y: auto; z-index: 50;
+        box-shadow: 0 10px 25px rgba(255, 138, 91, 0.15);
+        margin-top: 0.5rem; display: none; /* 평소에는 숨겨둠 */
     }
-
-    /* Firefox 등 다른 브라우저 대응 (필요시) */
-    input::-ms-expand {
-    display: none;
+    .custom-dropdown.active { display: block; /* 활성화되면 보여짐 */ }
+    .custom-option {
+        padding: 1rem 1.5rem; font-weight: 700; color: #444;
+        cursor: pointer; transition: all 0.2s; border-bottom: 1px solid #FDF5E6;
     }
+    .custom-option:last-child { border-bottom: none; }
+    .custom-option:hover { background-color: #FFF5F0; color: #FF8A5B; padding-left: 2rem; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -82,22 +82,14 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea 
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
       <div class="edit-card p-12 space-y-6">
-        <div>
-          <label class="label-text">아이디 (변경불가)</label>
-          <input type="text" th:value="${displayId}" class="input-field input-readonly" readonly disabled>
-        </div>
-
+        <div><label class="label-text">아이디 (변경불가)</label><input type="text" th:value="${displayId}" class="input-field input-readonly" readonly disabled></div>
         <div>
           <label class="label-text">이메일</label>
           <div class="flex gap-3">
-            <input type="email" id="emailDisplay"
-                   th:value="${user.email != null ? user.email.replaceAll('(^[^@]{2})[^@]+(@[^@]{1})[^@]+(\.[^@]+$)', '$1******$2*******$3') : ''}"
-                   class="input-field input-readonly" readonly>
-            <button th:if="${user.socialLoginSite == null or user.socialLoginSite == ''}"
-                    type="button" onclick="openModal('emailModal')" class="btn-action">수정</button>
+            <input type="email" id="emailDisplay" th:value="${user.email != null ? user.email.replaceAll('(^[^@]{2})[^@]+(@[^@]{1})[^@]+(\.[^@]+$)', '$1******$2*******$3') : ''}" class="input-field input-readonly" readonly>
+            <button th:if="${user.socialLoginSite == null or user.socialLoginSite == ''}" type="button" onclick="openModal('emailModal')" class="btn-action">수정</button>
           </div>
         </div>
-
         <div th:if="${user.socialLoginSite == null or user.socialLoginSite == ''}">
           <label class="label-text">비밀번호</label>
           <div class="flex gap-3">
@@ -105,7 +97,6 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea 
             <button type="button" onclick="openModal('pwModal')" class="btn-action">수정</button>
           </div>
         </div>
-
         <div>
           <label class="label-text">닉네임</label>
           <div class="flex gap-3">
@@ -114,12 +105,7 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea 
           </div>
           <p id="nickStatus" class="text-xs mt-2 ml-4 font-bold"></p>
         </div>
-
-        <div>
-          <label class="label-text">이름 (변경불가)</label>
-          <input type="text" th:field="*{name}" class="input-field input-readonly" readonly disabled>
-        </div>
-
+        <div><label class="label-text">이름 (변경불가)</label><input type="text" th:field="*{name}" class="input-field input-readonly" readonly disabled></div>
         <div>
           <label class="label-text">전화번호 (변경불가)</label>
           <div class="phone-group">
@@ -135,16 +121,22 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea 
 
       <div class="edit-card p-12 bg-[#FF8A5B]/2 space-y-10">
         <h3 class="text-3xl font-black text-[#FF8A5B] italic uppercase tracking-tight">음식 취향</h3>
+
         <div>
           <label class="label-text text-blue-400">좋아하는 음식 ❤️</label>
-          <input type="text" th:field="*{likeMenu}" id="likeMenuInput" list="food-options" autocomplete="off" class="input-field" placeholder="쉼표로 구분해 입력해주세요.">
-        </div>
-        <div>
-          <label class="label-text text-red-400">싫어하는 음식 💔</label>
-          <input type="text" th:field="*{disLikeMenu}" id="disLikeMenuInput" list="food-options" autocomplete="off" class="input-field" placeholder="못 먹는 음식을 쉼표로 구분해 입력해주세요.">
+          <div class="input-wrapper">
+            <input type="text" th:field="*{likeMenu}" autocomplete="off" class="input-field" placeholder="쉼표로 구분해 입력해주세요.">
+            <div id="likeMenuDropdown" class="custom-dropdown"></div>
+          </div>
         </div>
 
-        <datalist id="food-options"></datalist>
+        <div>
+          <label class="label-text text-red-400">싫어하는 음식 💔</label>
+          <div class="input-wrapper">
+            <input type="text" th:field="*{disLikeMenu}" autocomplete="off" class="input-field" placeholder="못 먹는 음식을 쉼표로 구분해 입력해주세요.">
+            <div id="dislikeMenuDropdown" class="custom-dropdown"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -202,19 +194,14 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea 
   let isNicknameValid = true;
   let timerInterval;
 
-  // 전화번호 마스킹 (010-1***-5***)
   const fp = document.getElementById('fullPhone'), p2 = document.getElementById('phone2'), p3 = document.getElementById('phone3');
   document.addEventListener('DOMContentLoaded', () => {
     if (fp.value) {
       const pts = fp.value.split('-');
-      if (pts.length === 3) {
-        p2.value = pts[1].substring(0, 1) + '***';
-        p3.value = pts[2].substring(0, 1) + '***';
-      }
+      if (pts.length === 3) { p2.value = pts[1].substring(0, 1) + '***'; p3.value = pts[2].substring(0, 1) + '***'; }
     }
   });
 
-  // 닉네임 체크
   document.getElementById('nicknameInput').addEventListener('input', (e) => {
     const s = document.getElementById('nickStatus');
     if(e.target.value === initialNickname) { isNicknameValid = true; s.innerText = ""; }
@@ -233,7 +220,6 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea 
     } else { alert("이미 사용 중인 닉네임입니다."); }
   }
 
-  // 모달 제어 로직
   function verifyEmailStep1() {
     if(document.getElementById('currEmail').value === initialEmail) {
       document.getElementById('emailStep1').classList.add('hidden');
@@ -270,7 +256,6 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea 
 
   const mP1 = document.getElementById('modalNewPw'), mP2 = document.getElementById('modalNewPwCheck'), pwBtn = document.getElementById('pwUpdateBtn');
   const pwRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
-
   function validatePasswords() {
     const v1 = mP1.value, v2 = mP2.value, isComp = pwRegex.test(v1), isMatch = (v1 === v2 && v1.length > 0);
     const msg = document.getElementById('pwComplexityMsg'), mMsg = document.getElementById('pwMatchMsg');
@@ -281,7 +266,6 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea 
     mMsg.className = isMatch ? "text-[0.7rem] font-bold text-green-500 ml-4" : "text-[0.7rem] font-bold text-red-500 ml-4";
     pwBtn.disabled = !(isComp && isMatch);
   }
-
   [mP1, mP2].forEach(el => el.addEventListener('input', validatePasswords));
 
   async function apiUpdatePassword() {
@@ -299,11 +283,10 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea 
   function closeModalOnOutSide(e) { if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('active'); }
   function validateEditForm() { if(!isNicknameValid) { alert("닉네임 중복 확인이 필요합니다."); return false; } return true; }
 
-  // ==========================================
-  // [새로 추가된 부분] 자동완성(Autocomplete) 일꾼 로직
-  // ==========================================
 
-  // 1. 우리가 가진 133개의 전체 음식 사전(Database 역할)입니다.
+  // =======================================================
+  // 🌟 완벽 진화! 수제 메뉴판 관리 매니저 (JavaScript)
+  // =======================================================
   const foodMasterList = [
       "갈비찜", "감자탕", "곱창전골", "김치찌개", "냉면", "닭볶음탕", "된장찌개", "떡볶이", "보쌈", "부대찌개",
       "불고기", "비빔밥", "삼겹살", "삼계탕", "설렁탕", "소머리국밥", "순대국밥", "순대볶음", "순두부찌개", "육개장",
@@ -321,81 +304,75 @@ h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select, textarea 
       "팟타이", "푸팟퐁커리", "허르헉"
   ];
 
-  // 2. 비어있는 메뉴판(datalist)에 133개의 음식을 하나씩 채워 넣는 작업 반장(함수)입니다.
-  function setupAutocomplete() {
-      const datalist = document.getElementById('food-options');
-      if (datalist) {
-          datalist.innerHTML = ""; // 칠판을 깨끗이 지웁니다 (중복 방지)
+  // 입력창(input)과 수제 메뉴판(dropdown)을 짝지어 연결하는 일꾼
+  function createCustomAutocomplete(inputId, dropdownId) {
+      const input = document.getElementById(inputId);
+      const dropdown = document.getElementById(dropdownId);
+      if (!input || !dropdown) return;
+
+      // 1. 키보드 입력 이벤트 감지
+      input.addEventListener('input', function() {
+          const fullVal = this.value;
+          const parts = fullVal.split(',');
+          // 맨 마지막 단어 추출 (예: "치")
+          const currentWord = parts.pop().trim();
+          // 앞에 입력했던 단어들 킵해두기 (예: "피자, ")
+          const prefix = parts.length > 0 ? parts.join(', ') + ', ' : '';
+
+          // 메뉴판 지우기
+          dropdown.innerHTML = "";
+
+          // 만약 방금 쉼표를 찍고 아무 글자도 안 쳤거나 빈칸이면 메뉴판 숨김
+          if (currentWord.length === 0) {
+              dropdown.classList.remove('active');
+              return;
+          }
+
+          let hasMatch = false; // 검색 결과가 하나라도 있는지 확인용
 
           foodMasterList.forEach(food => {
-              const option = document.createElement('option');
-              option.value = food; // '<option value="불고기"></option>' 형태를 만듭니다.
-              datalist.appendChild(option);
+              // 앞에서 이미 고른 음식은 빼고, 검색어와 일치하는 음식만 찾기
+              if (!prefix.includes(food) && food.includes(currentWord)) {
+                  hasMatch = true;
+
+                  // <div> 태그로 나만의 '옵션' 생성
+                  const optionDiv = document.createElement('div');
+                  optionDiv.className = 'custom-option';
+                  // 🌟 화면에는 깔끔하게 '치킨' 하나만 보여줍니다!
+                  optionDiv.textContent = food;
+
+                  // 🌟 마우스로 메뉴를 클릭했을 때의 마법!
+                  optionDiv.addEventListener('click', function() {
+                      // 입력창에는 [과거 글자들 + 방금 클릭한 글자 + 쉼표]를 조립해서 꽂아넣습니다.
+                      input.value = prefix + food + ", ";
+                      dropdown.classList.remove('active'); // 볼일 끝났으니 메뉴판 닫기
+                      input.focus(); // 커서를 입력창에 다시 두기
+                  });
+
+                  dropdown.appendChild(optionDiv);
+              }
           });
-      }
+
+          // 검색 결과가 있으면 메뉴판 띄우고, 없으면 닫기
+          if (hasMatch) {
+              dropdown.classList.add('active');
+          } else {
+              dropdown.classList.remove('active');
+          }
+      });
+
+      // 2. 화면 다른 곳을 클릭하면 센스 있게 메뉴판을 접어주는 기능
+      document.addEventListener('click', function(e) {
+          if (e.target !== input && !dropdown.contains(e.target)) {
+              dropdown.classList.remove('active');
+          }
+      });
   }
 
-  //[해결책] 쉼표 뒤에서도 자동완성을 띄워주는 핵심 일꾼 함수
-  function enableMultiAutocomplete(inputId) {
-    const input = document.getElementById(inputId);
-    const datalist = document.getElementById('food-options');
-    if (!input || !datalist) return;
-
-    // 🌟 핵심 1: 현재 입력창에 이미 글자가 있다면(수정 페이지니까요!) 그 값을 미리 기억해둡니다.
-    let lastStableValue = input.value;
-
-    input.addEventListener('input', function(e) {
-        const fullVal = this.value;
-
-        // 🌟 핵심 2: [선택 모드] 리스트에서 음식을 딱 골랐을 때!
-        // inputType이 없고, 선택된 값이 우리 음식 사전에 있다면 실행합니다.
-        if (!e.inputType && foodMasterList.includes(fullVal)) {
-            const lastCommaIndex = lastStableValue.lastIndexOf(',');
-            let finalValue = "";
-
-            if (lastCommaIndex === -1) {
-                // 첫 번째 단어로 선택했을 때 (예: "불고기, ")
-                finalValue = fullVal + ", ";
-            } else {
-                // 두 번째 이후로 선택했을 때 (예: "불고기, " + "치킨" -> "불고기, 치킨, ")
-                // 마지막 쉼표까지만 살리고 뒤에 새 음식을 붙입니다.
-                const prefix = lastStableValue.substring(0, lastCommaIndex + 1);
-                finalValue = prefix + " " + fullVal + ", ";
-            }
-
-            this.value = finalValue;
-            lastStableValue = finalValue; // 완성된 문장을 다시 기억합니다.
-            return;
-        }
-
-        // 🌟 핵심 3: [타이핑 모드] 사용자가 키보드로 글자를 칠 때!
-        const lastCommaIndex = fullVal.lastIndexOf(',');
-        const currentWord = (lastCommaIndex === -1)
-            ? fullVal.trim()
-            : fullVal.substring(lastCommaIndex + 1).trimStart();
-
-        datalist.innerHTML = "";
-
-        if (currentWord.length >= 1) {
-            foodMasterList.forEach(food => {
-                // 이미 입력창에 있는 단어는 메뉴판에서 빼줍니다 (중복 방지)
-                if (food.includes(currentWord.trim()) && !fullVal.includes(food)) {
-                    const option = document.createElement('option');
-                    option.value = food;
-                    datalist.appendChild(option);
-                }
-            });
-        }
-        // 다음 "선택" 순간을 위해 현재 타이핑 중인 상태를 계속 업데이트합니다.
-        lastStableValue = this.value;
-    });
-}
-
-  // 🚀 모든 준비가 끝났을 때(페이지 로드 완료) 한꺼번에 실행!
+  // 🌟 타임리프가 만들어낸 진짜 ID인 'likeMenu'와 'disLikeMenu'를 넘겨줍니다!
   window.addEventListener('load', () => {
-
-      enableMultiAutocomplete('likeMenuInput'); // 2. 좋아하는 음식창 감시 시작
-      enableMultiAutocomplete('disLikeMenuInput'); // 3. 싫어하는 음식창 감시 시작
+      createCustomAutocomplete('likeMenu', 'likeMenuDropdown');
+      createCustomAutocomplete('disLikeMenu', 'dislikeMenuDropdown');
   });
 </script>
 </body>

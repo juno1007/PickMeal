@@ -76,12 +76,20 @@
       <h2 class="text-3xl font-black text-[#FF8A5B] italic mb-6 uppercase">음식 리스트</h2>
       <div id="item-list" class="space-y-3 mb-6 max-h-[300px] overflow-y-auto pr-2 scroller">
       </div>
-      <div class="flex gap-2">
-        <input type="text" id="new-item" list="food-options" placeholder="음식을 입력해주세요..." class="input-field flex-grow px-4 py-3 font-bold" onkeypress="if(event.keyCode==13) addItem()">
+      <div class="flex gap-2 relative w-full">
+        <div class="flex flex-col flex-grow relative">
+          <input type="text" id="new-item" placeholder="음식을 입력해주세요..."
+                 class="input-field w-full px-4 py-3 font-bold"
+                 oninput="showSuggestions(this.value)"
+                 onkeypress="if(event.keyCode==13) addItem()"
+                 autocomplete="off">
 
-        <datalist id="food-options"></datalist>
+          <div id="suggestion-box"
+               class="absolute top-full left-0 w-full bg-white border-2 border-[#FF8A5B] rounded-xl shadow-xl z-[100] hidden max-h-[200px] overflow-y-auto mt-1">
+          </div>
+        </div>
 
-        <button onclick="addItem()" class="bg-[#4CAF50] text-white px-6 py-3 rounded-2xl font-black shadow-md hover:bg-[#43a047] transition">+</button>
+        <button onclick="addItem()" class="bg-[#4CAF50] text-white px-6 py-3 rounded-2xl font-black shadow-md hover:bg-[#43a047] transition h-[54px]">+</button>
       </div>
       <p class="text-gray-400 mt-4 text-sm font-bold italic text-center">Min 2, Max 12 items recommended!</p>
     </div>
@@ -96,7 +104,6 @@
   let items = ["짜장면", "김치찌개", "규동", "타코"];
   const colors = ["#FF8A5B", "#4CAF50", "#FFD93D", "#6BCB77", "#4D96FF", "#FF6B6B", "#9575CD", "#4DB6AC"];
 
-  // 133개 음식 사전 (여기에 싹 몰아넣었습니다)
   const foodMasterList = [
       "갈비찜", "감자탕", "곱창전골", "김치찌개", "냉면", "닭볶음탕", "된장찌개", "떡볶이", "보쌈", "부대찌개",
       "불고기", "비빔밥", "삼겹살", "삼계탕", "설렁탕", "소머리국밥", "순대국밥", "순대볶음", "순두부찌개", "육개장",
@@ -114,23 +121,45 @@
       "팟타이", "푸팟퐁커리", "허르헉"
   ];
 
-  // [중복 해결 버전] 딱 한 번만 깔끔하게 메뉴를 채우는 코드입니다.
-  function setupAutocomplete() {
-      const datalist = document.getElementById('food-options');
-      if (datalist) {
-          datalist.innerHTML = ""; // 칠판을 먼저 깨끗이 지우기 (중복 방지!)
-          foodMasterList.forEach(food => {
-              const option = document.createElement('option');
-              option.value = food;
-              datalist.appendChild(option);
-          });
+  // [기능 1] 실시간 추천 목록 표시 (타이핑 시 실행)
+  function showSuggestions(val) {
+      const box = document.getElementById('suggestion-box');
+      if (!val.trim()) {
+          box.classList.add('hidden');
+          return;
+      }
+      const filtered = foodMasterList.filter(food => food.includes(val)).slice(0, 8);
+      if (filtered.length > 0) {
+          box.innerHTML = filtered.map(food => `
+              <div class="p-3 hover:bg-[#FFF5F0] hover:text-[#FF8A5B] cursor-pointer font-bold border-b last:border-0 border-gray-100 text-left"
+                   onclick="selectFood('${food}')">
+                  ${food}
+              </div>
+          `).join('');
+          box.classList.remove('hidden');
+      } else {
+          box.classList.add('hidden');
       }
   }
 
-  // 페이지가 로딩되면 이 일꾼을 딱 한 번만 부릅니다.
-  window.addEventListener('load', setupAutocomplete);
+  // [기능 2] 추천 음식 선택 시 입력창에 삽입
+  function selectFood(name) {
+      const input = document.getElementById('new-item');
+      input.value = name;
+      document.getElementById('suggestion-box').classList.add('hidden');
+      input.focus();
+  }
 
-  // 룰렛 회전 관련 변수 (원래 있던 것들)
+  // [기능 3] 입력창 외 클릭 시 박스 닫기
+  document.addEventListener('click', function(e) {
+      const box = document.getElementById('suggestion-box');
+      const input = document.getElementById('new-item');
+      if (!input.contains(e.target) && !box.contains(e.target)) {
+          box.classList.add('hidden');
+      }
+  });
+
+  // --- 기존 룰렛 로직 ---
   let isSpinning = false;
   let currentRotation = 0;
 
@@ -138,7 +167,6 @@
       const numSegments = items.length;
       const angleStep = (2 * Math.PI) / numSegments;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       items.forEach((item, i) => {
           const angle = i * angleStep;
           ctx.beginPath();
@@ -146,13 +174,12 @@
           ctx.moveTo(200, 200);
           ctx.arc(200, 200, 200, angle, angle + angleStep);
           ctx.fill();
-
           ctx.save();
           ctx.translate(200, 200);
           ctx.rotate(angle + angleStep / 2);
           ctx.textAlign = "right";
           ctx.fillStyle = "white";
-          ctx.font = "bold 18px Fredoka";
+          ctx.font = "bold 18px Jua"; // 폰트 일관성을 위해 Jua 적용
           ctx.fillText(item, 180, 10);
           ctx.restore();
       });
@@ -170,18 +197,16 @@
   }
 
   function addItem() {
-    const input = document.getElementById("new-item");
-    let val = input.value.trim(); // 사용자가 입력창에 쓴 글자 (예: "치킨")
-
-    if (val && items.length < 12) {
-        // ✨ [수정] 복잡한 매칭 로직을 다 지우고, 사용자가 입력한 val을 그대로 넣습니다!
-        const finalItem = val;
-
-        items.push(finalItem); // 룰렛 배열에 "치킨" 그대로 추가
-        input.value = "";      // 입력창 비우기
-        updateList();          // 룰렛판 다시 그리기
-    }
-}
+      const input = document.getElementById("new-item");
+      const box = document.getElementById("suggestion-box");
+      let val = input.value.trim();
+      if (val && items.length < 12) {
+          items.push(val);
+          input.value = "";
+          box.classList.add('hidden'); // ✨ 추가 후 추천 박스 숨김
+          updateList();
+      }
+  }
 
   function removeItem(index) {
       if (items.length > 2) {
@@ -195,86 +220,64 @@
   function spin() {
       if (isSpinning) return;
       isSpinning = true;
-
       const spinBtn = document.getElementById("spin-btn");
       spinBtn.disabled = true;
       spinBtn.classList.add('opacity-50');
-
       const randomSpin = Math.floor(Math.random() * 360) + 1440;
       currentRotation += randomSpin;
-
       canvas.style.transform = `rotate(${currentRotation - 90}deg)`;
-
       setTimeout(() => {
           isSpinning = false;
           spinBtn.disabled = false;
           spinBtn.classList.remove('opacity-50');
-
           const actualRotation = currentRotation % 360;
           const segmentAngle = 360 / items.length;
           const winIdx = Math.floor((360 - actualRotation) / segmentAngle) % items.length;
-
           showResult(items[winIdx]);
       }, 4000);
   }
 
-  // [수정 완료] 월드컵 스타일 + 쏠림 방지 + 글자 크기 확대(text-5xl)
- async function showResult(foodName) {
-    let realImagePath = "/images/meal.png";
-    try {
-        const response = await fetch(`/api/food/image?name=${encodeURIComponent(foodName)}`);
-        if(response.ok) {
-            let path = await response.text();
-            if (path && path.trim() !== "" && path !== "/images/meal.png") {
-                realImagePath = path.trim().replace(/ /g, '%20');
-            }
-        }
-    } catch(error) {
-        console.error("이미지 로딩 실패:", error);
-    }
+  async function showResult(foodName) {
+      let realImagePath = "/images/meal.png";
+      try {
+          const response = await fetch(`/api/food/image?name=${encodeURIComponent(foodName)}`);
+          if(response.ok) {
+              let path = await response.text();
+              if (path && path.trim() !== "" && path !== "/images/meal.png") {
+                  realImagePath = path.trim().replace(/ /g, '%20');
+              }
+          }
+      } catch(error) { console.error("이미지 로딩 실패:", error); }
+      const mainContent = document.getElementById('main-content');
+      mainContent.className = "flex flex-col items-center justify-center w-full min-h-[70vh] px-10";
+      mainContent.innerHTML = `
+          <div class="flex flex-col items-center justify-center w-full animate-bounce mb-2">
+              <h2 class="text-[#FF8A5B] font-black text-5xl uppercase italic tracking-tighter">WINNER</h2>
+          </div>
+          <div class="bg-white winner-card-mid shadow-2xl border-4 border-[#FF8A5B] w-full text-center">
+              <div class="winner-img-mid mb-6 shadow-md bg-gray-50">
+                  <img src="${realImagePath}" class="w-full h-full object-contain p-4" onerror="this.src='/images/meal.png'">
+              </div>
+              <h1 class="text-4xl font-black text-gray-800 italic mb-6 uppercase tracking-tighter">${foodName}</h1>
+              <div class="grid grid-cols-2 gap-3 mb-4">
+                  <button onclick="location.href='/game'" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm hover:bg-gray-200 transition">HOME 🏠</button>
+                  <button onclick="location.reload()" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm hover:bg-gray-200 transition">RESTART 🔄</button>
+                  <button onclick="location.href='/worldcup/ranking'" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm hover:bg-gray-200 transition">RANK 🏆</button>
+                  <button onclick="copyToClipboard('${foodName}')" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm hover:bg-gray-200 transition">SHARE 🔗</button>
+              </div>
+              <button onclick="window.open('https://map.kakao.com/link/search/' + encodeURIComponent('${foodName}'))"
+                      class="w-full py-4 bg-[#FAE100] rounded-full font-black text-lg shadow-md hover:bg-[#ebd300] transition italic">
+                  주변 맛집 찾기 📍
+              </button>
+          </div>`;
+      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, zIndex: 9999 });
+  }
 
-    const mainContent = document.getElementById('main-content');
+  window.copyToClipboard = function(foodName) {
+      navigator.clipboard.writeText(`🏆 나의 원픽 메뉴: [${foodName}]`).then(() => alert("복사 완료!"));
+  };
 
-    // 레이아웃 초기화 및 수직 중앙 정렬
-    mainContent.className = "flex flex-col items-center justify-center w-full min-h-[70vh] px-10";
-
-    mainContent.innerHTML = `
-        <div class="flex flex-col items-center justify-center w-full animate-bounce mb-2">
-            <h2 class="text-[#FF8A5B] font-black text-5xl uppercase italic tracking-tighter">WINNER</h2>
-        </div>
-        <div class="bg-white winner-card-mid shadow-2xl border-4 border-[#FF8A5B] w-full text-center">
-            <div class="winner-img-mid mb-6 shadow-md bg-gray-50">
-                <img src="${realImagePath}"
-                     class="w-full h-full object-contain p-4"
-                     onerror="this.src='/images/meal.png'">
-            </div>
-            <h1 class="text-4xl font-black text-gray-800 italic mb-6 uppercase tracking-tighter">${foodName}</h1>
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <button onclick="location.href='/game'" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm hover:bg-gray-200 transition">HOME 🏠</button>
-                <button onclick="location.reload()" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm hover:bg-gray-200 transition">RESTART 🔄</button>
-                <button onclick="location.href='/worldcup/ranking'" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm hover:bg-gray-200 transition">RANK 🏆</button>
-                <button onclick="copyToClipboard('${foodName}')" class="py-3 bg-gray-100 rounded-2xl font-bold italic uppercase text-sm hover:bg-gray-200 transition">SHARE 🔗</button>
-            </div>
-            <button onclick="window.open('https://map.kakao.com/link/search/' + encodeURIComponent('${foodName}'))"
-                    class="w-full py-4 bg-[#FAE100] rounded-full font-black text-lg shadow-md hover:bg-[#ebd300] transition italic">
-                주변 맛집 찾기 📍
-            </button>
-        </div>
-    `;
-
-    confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-        zIndex: 9999
-    });
-}
-
-window.copyToClipboard = function(foodName) {
-    navigator.clipboard.writeText(`🏆 나의 원픽 메뉴: [${foodName}]`).then(() => alert("복사 완료!"));
-};
-
-updateList();
+  updateList();
 </script>
 </body>
 </html>
