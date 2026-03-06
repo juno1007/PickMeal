@@ -29,7 +29,7 @@ public interface UserMapper {
 
     void updateUserSuspension(User user);
 
-    void releaseExpiredSuspensions();
+    int releaseExpiredSuspensions();
 
     void updateWithdrawal(User user);
 
