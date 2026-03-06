@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/default}">
+<head>
+    <title>Pick Meal - Admin</title>
+    <link rel="icon" href="/images/pickmeal_favicon.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+        h1, h2, h3, h4, h5, h6, p, span, div, button, a, label, input, select {
+            font-family: 'Fredoka', 'Jua', sans-serif !important; font-style: normal !important;
+        }
+        .italic-title { font-style: italic !important; }
+        body { background-color: #FFF5F0 !important; }
+        .admin-card {
+            background: white; border-radius: 3rem; box-shadow: 0 20px 60px rgba(0,0,0,0.05); border: 4px solid #FF8A5B;
+        }
+        .input-field {
+            border-radius: 2rem; background-color: #f9fafb; transition: all 0.3s; border: 2px solid transparent;
+        }
+        .input-field:focus {
+            outline: none; background-color: white; border-color: #FF8A5B; box-shadow: 0 0 0 4px rgba(255, 138, 91, 0.15);
+        }
+        .content-slide-up { animation: slideUp 0.6s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+<header th:replace="~{fragments/header :: headerFragment}"></header>
+<div layout:fragment="content" class="min-h-screen flex items-start justify-center pt-32 pb-20 px-4">
+    <div class="w-full max-w-2xl content-slide-up">
+
+        <div class="text-center mb-10">
+            <h2 class="text-5xl font-black text-[#FF8A5B] italic-title uppercase tracking-tighter">ADMIN MODE</h2>
+            <p class="text-gray-400 mt-2 font-bold">불량 회원 관리 및 상태 제어 페이지</p>
+        </div>
+
+        <div th:if="${successMessage}" class="bg-green-100 border-2 border-green-400 text-green-700 px-6 py-4 rounded-2xl mb-6 font-bold text-center shadow-sm" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="bg-red-100 border-2 border-red-400 text-red-700 px-6 py-4 rounded-2xl mb-6 font-bold text-center shadow-sm" th:text="${errorMessage}"></div>
+
+        <div class="admin-card p-8 mb-8">
+            <h3 class="text-2xl font-black text-gray-800 mb-4">🔍 회원 닉네임 검색</h3>
+            <form th:action="@{/admin/users}" method="get" class="flex flex-col sm:flex-row gap-3">
+                <input type="text" name="searchKeyword" class="input-field flex-grow px-6 py-4 text-lg font-bold" placeholder="정지할 회원의 닉네임 입력..." required>
+                <button type="submit" class="bg-[#FF8A5B] text-white px-8 py-4 rounded-full font-black text-xl shadow-lg hover:scale-105 transition italic uppercase whitespace-nowrap">
+                    검색하기
+                </button>
+            </form>
+        </div>
+
+        <div th:if="${searchedUsers != null and !searchedUsers.isEmpty()}" class="space-y-6">
+
+            <div th:each="searchedUser : ${searchedUsers}" class="admin-card p-8 text-center sm:text-left relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-3 bg-[#FF8A5B]"></div>
+
+                <div class="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 mt-2">
+                    <div class="w-full">
+                        <h3 class="text-3xl font-black text-gray-800 mb-1">
+                            <span th:text="${searchedUser.nickname}" class="text-[#FF8A5B]">닉네임</span> 님
+                        </h3>
+                        <p class="text-gray-500 font-bold mb-4">
+                            이름: <span th:text="${searchedUser.name}">이름</span>
+                        </p>
+
+                        <div class="bg-gray-50 rounded-3xl p-6 space-y-3 border-2 border-gray-100">
+                            <div class="flex justify-between items-center border-b border-gray-200 pb-2">
+                                <span class="text-gray-500 font-bold">아이디</span>
+                                <span class="text-md font-black text-gray-800 break-all" th:text="${searchedUser.id}"></span>
+                            </div>
+                            <div class="flex justify-between items-center pt-1">
+                                <span class="text-gray-500 font-bold">현재 상태</span>
+                                <span th:if="${searchedUser.status == 'ACTIVE'}" class="px-4 py-1.5 bg-green-100 text-green-600 rounded-full font-black text-sm tracking-widest">ACTIVE</span>
+                                <span th:if="${searchedUser.status == 'SUSPENDED'}" class="px-4 py-1.5 bg-red-100 text-red-600 rounded-full font-black text-sm tracking-widest animate-pulse">SUSPENDED</span>
+                                <span th:if="${searchedUser.status == 'WITHDRAWN'}" class="px-4 py-1.5 bg-gray-200 text-gray-500 rounded-full font-black text-sm tracking-widest">WITHDRAWN</span>
+                            </div>
+                        </div>
+
+                        <div th:if="${searchedUser.status == 'SUSPENDED' && searchedUser.suspensionEndDate != null}" class="mt-4 p-4 bg-red-50 border-2 border-red-200 rounded-2xl text-center">
+                            <p class="text-red-500 font-black text-lg">
+                                🚨 정지 해제일: <span th:text="${#temporals.format(searchedUser.suspensionEndDate, 'yyyy년 MM월 dd일 HH시 mm분')}"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-gray-200 my-6 border-dashed">
+
+                <form th:if="${searchedUser.status != 'SUSPENDED' && searchedUser.status != 'WITHDRAWN'}" th:action="@{/admin/users/suspend}" method="post" class="flex flex-col sm:flex-row gap-3">
+                    <input type="hidden" name="user_id" th:value="${searchedUser.user_id}">
+                    <select name="days" class="input-field flex-grow px-6 py-4 text-lg font-bold border-2 border-gray-200 text-center cursor-pointer">
+                        <option value="7">⛔ 7일 정지</option>
+                        <option value="14">⛔ 14일 정지</option>
+                        <option value="30">⛔ 30일 정지</option>
+                        <option value="9999">💀 영구 정지</option>
+                    </select>
+                    <button type="submit" class="bg-red-500 text-white px-8 py-4 rounded-full font-black text-xl shadow-lg hover:scale-105 hover:bg-red-600 transition whitespace-nowrap">
+                        정지 처리하기
+                    </button>
+                </form>
+
+                <form th:if="${searchedUser.status == 'SUSPENDED'}" th:action="@{/admin/users/unsuspend}" method="post">
+                    <input type="hidden" name="user_id" th:value="${searchedUser.user_id}">
+                    <button type="submit" class="w-full bg-[#4CAF50] text-white px-8 py-5 rounded-full font-black text-xl shadow-lg hover:scale-105 hover:bg-[#43a047] transition">
+                        ✨ 정지 즉시 해제하기
+                    </button>
+                </form>
+
+                <div th:if="${searchedUser.status == 'WITHDRAWN'}" class="text-center p-4 bg-gray-100 rounded-2xl">
+                    <p class="text-gray-400 font-bold">탈퇴 회원은 상태를 변경할 수 없습니다.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<footer th:replace="~{fragments/footer :: footerFragment}"></footer>
+</body>
+</html>

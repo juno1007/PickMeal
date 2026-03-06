@@ -57,10 +57,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String cleanId = rawId.replace(registrationId + "_", "").replace(registrationId, "");
         String finalId = registrationId + "_" + cleanId;
 
-        // 3. 탈퇴 체크 (기존 로직 유지)
+        // 3. 기존 탈퇴 체크를 지우고, 정지 유저 체크로 변경
         User user = userMapper.findById(finalId);
-        if (user != null && "WITHDRAWN".equals(user.getStatus())) {
-            throw new OAuth2AuthenticationException(new OAuth2Error("withdrawn_user"), "탈퇴 회원");
+        if (user != null && "SUSPENDED".equals(user.getStatus())) {
+            throw new OAuth2AuthenticationException(new OAuth2Error("suspended_user"), "정지된 회원");
         }
 
         // 4. 권한 부여 로직 분리 (중요!)

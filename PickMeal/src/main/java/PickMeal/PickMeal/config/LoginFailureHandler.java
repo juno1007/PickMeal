@@ -32,21 +32,22 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
             org.springframework.security.oauth2.core.OAuth2AuthenticationException oauthException =
                     (org.springframework.security.oauth2.core.OAuth2AuthenticationException) exception;
 
-            // 에러 코드나 메시지에 "withdrawn_user"가 포함되어 있는지 확인
             String errorCode = oauthException.getError().getErrorCode();
+
+            // 기존 탈퇴 메시지 처리 (유지)
             if ("withdrawn_user".equals(errorCode) || (exception.getMessage() != null && exception.getMessage().contains("withdrawn_user"))) {
                 errorMessage = "탈퇴 처리된 계정입니다. 고객센터에 문의해주세요.";
             }
-        }
-        // 5. 일반 로그인 혹은 기타 예외에서 메시지 포함 여부 확인
-        else if (exception.getMessage() != null && exception.getMessage().contains("withdrawn_user")) {
-            errorMessage = "탈퇴 처리된 계정입니다. 고객센터에 문의해주세요.";
+            // 🚩 [추가] 소셜 로그인 정지된 계정 처리
+            else if ("suspended_user".equals(errorCode)) {
+                errorMessage = "운영원칙 위반으로 이용이 정지된 계정입니다.";
+            }
         }
 
-        // 6. 세션에 메시지 저장
+        // 5. 세션에 메시지 저장
         request.getSession().setAttribute("errorMessage", errorMessage);
 
-        // 7. 로그인 페이지로 리다이렉트
+        // 6. 로그인 페이지로 리다이렉트
         response.sendRedirect(request.getContextPath() + "/users/login");
     }
 }

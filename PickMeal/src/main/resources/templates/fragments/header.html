@@ -40,7 +40,11 @@
                 관리자 <span th:text="${#authentication.principal.name}"></span>님
             </span>
             </div>
-
+            <a sec:authorize="hasRole('ADMIN')"
+               th:href="@{/admin/users}"
+               class="nav-link text-gray-800 hover:text-[#FF8A5B] transition font-black whitespace-nowrap uppercase">
+                ADMIN PAGE
+            </a>
             <form th:action="@{/users/logout}" method="post" class="inline">
                 <button type="submit"
                         class="nav-link text-[#FF8A5B] font-black italic bg-transparent border-0 cursor-pointer hover:scale-105 transition whitespace-nowrap">

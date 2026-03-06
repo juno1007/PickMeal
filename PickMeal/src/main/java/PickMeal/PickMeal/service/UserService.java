@@ -207,22 +207,36 @@ public class UserService implements UserDetailsService {
         userMapper.edit(user);
     }
 
-    // 기존 remove 메서드를 이걸로 교체하세요!
     @Transactional
     public void remove(Long user_id) {
-        // 1. 탈퇴할 유저 정보를 가져옵니다.
         User user = userMapper.findByUser_id(user_id);
 
         if (user != null) {
-            // 2. 재가입 시 중복을 피하기 위해 값 뒤에 "_W_고유번호"를 붙여 익명화 처리
-            // (예: 원래 아이디가 'test1'이고 PK가 15라면 -> 'test1_W_15'로 변경)
             String suffix = "_W_" + user.getUser_id();
 
-            user.setId(user.getId() + suffix);
-            user.setEmail(user.getEmail() + suffix);
-            user.setNickname(user.getNickname() + suffix);
+            // 1. ID (최대 255자)
+            String newId = user.getId() + suffix;
+            if(newId.length() > 255) {
+                newId = user.getId().substring(0, 255 - suffix.length()) + suffix;
+            }
 
-            // 3. 상태값을 WITHDRAWN으로 바꿔서 매퍼로 넘김
+            // 2. Email (최대 50자)
+            String newEmail = user.getEmail() != null ? user.getEmail() + suffix : suffix;
+            if(newEmail.length() > 50) {
+                newEmail = user.getEmail().substring(0, 50 - suffix.length()) + suffix;
+            }
+
+            // 3. Nickname (최대 50자)
+            String newNickname = user.getNickname() != null ? user.getNickname() + suffix : suffix;
+            if(newNickname.length() > 50) {
+                newNickname = user.getNickname().substring(0, 50 - suffix.length()) + suffix;
+            }
+
+            user.setId(newId);
+            user.setEmail(newEmail);
+            user.setNickname(newNickname);
+
+            // 익명화 데이터로 DB 업데이트
             userMapper.updateWithdrawal(user);
         }
     }
@@ -317,18 +331,35 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    // --- 관리자(Admin) 전용 기능 ---
+
+    // 🚩 닉네임으로 회원 검색 (리스트 반환)
+    public List<User> searchByNickname(String nickname) {
+        return userMapper.searchUsersByNickname(nickname);
+    }
+
+    // 2. 회원 정지 적용
     @Transactional
-    public void suspendUser(Long userId, int suspendDays) {
-        User user = userMapper.findByUser_id(userId);
+    public void suspendUser(Long user_id, int suspendDays) {
+        User user = userMapper.findByUser_id(user_id);
+        if(user != null) {
+            // 현재 시간에 정지 일수를 더함 (9999일이면 영구정지로 간주)
+            LocalDateTime endDate = LocalDateTime.now().plusDays(suspendDays);
 
-        // 1. 현재 시간에서 정지 일수만큼 더해서 '해제 날짜' 계산
-        LocalDateTime endDate = LocalDateTime.now().plusDays(suspendDays);
+            user.setStatus("SUSPENDED");
+            user.setSuspensionEndDate(endDate);
+            userMapper.updateUserSuspension(user);
+        }
+    }
 
-        // 2. 상태를 SUSPENDED로 바꾸고 날짜 세팅
-        user.setStatus("SUSPENDED");
-        user.setSuspensionEndDate(endDate);
-
-        // 3. DB 업데이트 (Mapper에는 해당 정보를 업데이트하는 쿼리 필요)
-        userMapper.updateUserSuspension(user);
+    // 3. 회원 정지 즉시 해제 (실수했을 때를 대비)
+    @Transactional
+    public void unsuspendUser(Long user_id) {
+        User user = userMapper.findByUser_id(user_id);
+        if(user != null) {
+            user.setStatus("ACTIVE");
+            user.setSuspensionEndDate(null);
+            userMapper.updateUserSuspension(user);
+        }
     }
 }

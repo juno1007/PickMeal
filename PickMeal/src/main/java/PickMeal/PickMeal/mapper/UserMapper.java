@@ -45,6 +45,8 @@ public interface UserMapper {
 
     User findByUser_id(Long userId);
 
+    List<User> searchUsersByNickname(@Param("nickname") String nickname);
+
     /**
      * 이름과 이메일로 아이디 조회 (아이디 찾기용)
      */

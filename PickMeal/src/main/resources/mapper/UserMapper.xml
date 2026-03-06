@@ -153,4 +153,7 @@
           AND suspension_end_date <= NOW()
         ]]>
     </update>
+    <select id="searchUsersByNickname" resultType="PickMeal.PickMeal.domain.User">
+        SELECT * FROM user WHERE nickname LIKE CONCAT('%', #{nickname}, '%')
+    </select>
 </mapper>
