@@ -28,8 +28,8 @@
 | 포지션 | 이름 | 담당 업무 | Github |
 |:---:|:---:|---|:---:|
 | **팀장** | **강한수** | 프로젝트 총괄, 브랜치 병합 관리, 아키텍처 설계, 백엔드 개발 | [@dlive838-maker](https://github.com/dlive838-maker) |
-| **팀원** | **김승경** | AWS S3 이미지 인프라 구축, 카카오맵 API 연동 및 데이터 시각화 | [@juno1007](https://github.com/juno1007) |
-| **팀원** | **김재민** | 프론트엔드 UI/UX 디자인, HTML/CSS/JS 위주 뷰페이지 구현 | - |
+| **팀원** | **김승경** | AWS S3 이미지 인프라 구축, 카카오맵 API 연동 및 데이터 시각화 | [@iamsugu0106](https://github.com/iamsugu0106) |
+| **팀원** | **김재민** | 프론트엔드 UI/UX 디자인, HTML/CSS/JS 위주 뷰페이지 구현 | [@woals10006-commits](https://github.com/woals10006-commits)|
 | **팀원** | **황준호** | 월드컵 알고리즘 설계, OAuth2 연동, DB 및 카카오맵 API 구축 | [@juno1007](https://github.com/juno1007) |
 
 ---
