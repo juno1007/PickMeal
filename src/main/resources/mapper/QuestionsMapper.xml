@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hankki.pickmeal.mapper.QuestionsMapper">
+
+    <resultMap id="QuestionsResultMap" type="com.hankki.pickmeal.domain.Questions">
+        <id property="question_id" column="question_id"/>
+        <result property="question_text" column="question_text"/>
+        <result property="attribute_name" column="attribute_name"/>
+    </resultMap>
+
+    <select id="getFinalQuestion" resultType="String">
+        SELECT question_text
+        FROM questions
+        WHERE attribute_name = 'final_choice'
+        LIMIT 1
+    </select>
+
+    <select id="getQuestionsByAttributeName" resultMap="QuestionsResultMap">
+        SELECT question_id, question_text, attribute_name
+        FROM questions
+        WHERE attribute_name = #{category}
+    </select>
+</mapper>

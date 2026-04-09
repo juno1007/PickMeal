@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hankki.pickmeal.mapper.ReviewWishMapper">
+
+    <select id="checkWish" resultType="int">
+        SELECT COUNT(*) FROM place_stats
+        WHERE user_id = #{userId} AND res_id = #{resId} AND is_wish = 1
+    </select>
+
+    <delete id="deleteWish">
+        DELETE FROM place_stats
+        WHERE user_id = #{userId} AND res_id = #{resId} AND is_wish = 1
+    </delete>
+
+    <insert id="insertWish">
+        INSERT INTO place_stats (res_id, user_id, is_wish)
+        VALUES (#{resId}, #{userId}, 1)
+        ON DUPLICATE KEY UPDATE is_wish = 1
+    </insert>
+
+    <insert id="saveInteraction">
+        INSERT INTO place_stats (res_id, user_id, rating, content, is_wish)
+        VALUES (#{resId}, #{userId}, #{rating}, #{content}, 0)
+    </insert>
+
+    <select id="getTotalWishCount" resultType="int">
+        SELECT SUM(IFNULL(is_wish, 0))
+        FROM place_stats
+        WHERE res_id = #{resId}
+    </select>
+
+    <select id="getReviewCount" resultType="int">
+        SELECT COUNT(*)
+        FROM place_stats
+        WHERE res_id = #{resId}
+        AND content IS NOT NULL AND content != ''
+    </select>
+
+    <select id="getReviewsByRestaurant" resultType="com.hankki.pickmeal.dto.ReviewWishDTO">
+        SELECT
+        user_id as userId,
+        rating,
+        content,
+        created_at as createdAt
+        FROM place_stats
+        WHERE res_id = #{resId}
+        AND content IS NOT NULL AND content != ''
+        ORDER BY created_at DESC
+    </select>
+
+    <delete id="deleteReview">
+        DELETE FROM place_stats
+        WHERE review_id = #{reviewId}
+    </delete>
+</mapper>

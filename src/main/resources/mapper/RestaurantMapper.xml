@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hankki.pickmeal.mapper.RestaurantMapper">
+
+    <select id="findAllRestaurants" resultType="com.hankki.pickmeal.dto.RestaurantDTO">
+        SELECT
+        res_id AS restId,
+        res_name AS restName,
+        address AS restAddress,
+        representative_menu AS restMenu,
+        menu_price AS restPrice,
+        lat AS restLat,
+        lon AS restLng,   rest_views AS restViews
+        FROM restaurant
+    </select>
+
+    <select id="findAll" resultType="com.hankki.pickmeal.dto.RestaurantDTO">
+        SELECT
+        res_id AS restId,
+        res_name AS restName,
+        address AS restAddress,
+        representative_menu AS restMenu,  menu_price AS restPrice,
+        lat AS restLat,
+        lon AS restLng,
+        rest_views AS restViews,
+        (SELECT COUNT(*) FROM review_wish WHERE res_id = r.res_id AND is_wish = 1) AS wish_count
+        FROM restaurant r
+    </select>
+
+    <update id="updateViewCount">
+        UPDATE restaurant
+        SET rest_views = rest_views + 1
+        WHERE res_id = #{resId}
+    </update>
+
+    <select id="getMyLikedResturants" parameterType="String" resultType="com.hankki.pickmeal.dto.PlaceStatsDto">
+        SELECT
+        res_id as kakaoPlaceId,
+        place_name as placeName,
+        ROUND(IFNULL((SELECT AVG(rating) FROM place_stats
+        WHERE res_id = t.res_id
+        AND content IS NOT NULL AND content != ''), 0.0), 1) as avgRating,
+
+        IFNULL((SELECT SUM(view_count) FROM place_stats WHERE res_id = t.res_id), 0) as viewCount,
+
+        category,
+        address,
+        is_wish as liked,
+
+        (SELECT COUNT(*) FROM place_stats
+        WHERE res_id = t.res_id
+        AND content IS NOT NULL AND content != '') as reviewCount,
+
+        (SELECT COUNT(*) FROM place_stats
+        WHERE res_id = t.res_id AND is_wish = 1) as heartCount
+        FROM place_stats t
+        WHERE user_id = #{userId}
+        AND is_wish = 1
+        ORDER BY updated_at DESC
+    </select>
+    <update id="updatePlaceStatsView">
+        UPDATE place_stats
+        SET view_count = view_count + 1
+        WHERE res_id = #{resId}
+    </update>
+
+</mapper>

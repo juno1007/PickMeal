@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hankki.pickmeal.mapper.BoardMapper">
+
+    <resultMap id="BoardDetailMap" type="com.hankki.pickmeal.domain.Board">
+        <id property="boardId" column="boardId" />
+        <result property="user_id" column="user_id" />
+        <result property="title" column="title" />
+        <result property="content" column="content" />
+        <result property="createDate" column="createDate" />
+        <result property="updateDate" column="updateDate" />
+        <result property="viewCount" column="viewCount" />
+        <result property="likeCount" column="likeCount" />
+        <result property="dislikeCount" column="dislikeCount" />
+        <result property="commentCount" column="commentCount" />
+        <result property="nickname" column="nickname" />
+        <result property="is_notice" column="is_notice" /> </resultMap>
+
+    <select id="findNoticeTop" resultType="com.hankki.pickmeal.domain.Board">
+        SELECT b.*, u.nickname
+        FROM board b
+        JOIN user u ON b.user_id = u.user_id
+        WHERE b.is_notice = 'Y'
+        ORDER BY b.boardId DESC
+        LIMIT 5
+    </select>
+
+    <select id="findCommonBoard" resultType="com.hankki.pickmeal.domain.Board">
+        SELECT
+        b.*,
+        u.nickname,
+        (SELECT COUNT(*) FROM comment c WHERE c.boardId = b.boardId) as commentCount
+        FROM board b
+        JOIN user u ON b.user_id = u.user_id
+        WHERE b.is_notice = 'N'
+        ORDER BY b.boardId DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countCommonBoard" resultType="int">
+        SELECT COUNT(*) FROM board WHERE is_notice = 'N'
+    </select>
+
+    <insert id="writeBoard" parameterType="com.hankki.pickmeal.domain.Board" useGeneratedKeys="true" keyProperty="boardId">
+        INSERT INTO board(user_id, title, content, createDate, likeCount, dislikeCount, viewCount, is_notice)
+        VALUES(#{user_id}, #{title}, #{content}, NOW(), 0, 0, 0, #{is_notice})
+    </insert>
+
+    <select id="getBoardByBoardId" parameterType="long" resultMap="BoardDetailMap">
+        SELECT b.*, u.nickname
+        FROM board b
+        JOIN user u ON b.user_id = u.user_id
+        WHERE b.boardId = #{boardId}
+    </select>
+
+    <delete id="removeBoard" parameterType="long">
+        DELETE FROM board WHERE boardId = #{boardId}
+    </delete>
+
+    <update id="editBoard" parameterType="com.hankki.pickmeal.domain.Board">
+        UPDATE board
+        SET title = #{title}, content = #{content}, updateDate = NOW()
+        WHERE boardId = #{boardId}
+    </update>
+
+    <update id="updateViewCount" parameterType="long">
+        UPDATE board SET viewCount = viewCount + 1 WHERE boardId = #{boardId}
+    </update>
+
+    <update id="addLikeCount" parameterType="long">
+        UPDATE board SET likeCount = likeCount + 1 WHERE boardId = #{boardId}
+    </update>
+
+    <update id="addDislikeCount" parameterType="long">
+        UPDATE board SET dislikeCount = dislikeCount + 1 WHERE boardId = #{boardId}
+    </update>
+
+    <update id="removeLikeCount" parameterType="long">
+        UPDATE board
+        SET likeCount = likeCount - 1
+        WHERE boardId = #{boardId} AND likeCount > 0
+    </update>
+
+    <update id="removeDislikeCount" parameterType="long">
+        UPDATE board
+        SET dislikeCount = dislikeCount - 1
+        WHERE boardId = #{boardId} AND dislikeCount > 0
+    </update>
+
+    <select id="findByUser_id" resultType="com.hankki.pickmeal.domain.Board">
+        SELECT
+        b.*,
+        (SELECT COUNT(*) FROM comment c WHERE c.boardId = b.boardId) as commentCount
+        FROM board b
+        WHERE b.user_id = #{userId}
+        ORDER BY b.boardId DESC
+    </select>
+
+    <update id="plusCommentCount">
+        UPDATE board SET commentCount = commentCount + 1 WHERE boardId = #{boardId}
+    </update>
+
+    <update id="minusCommentCount">
+        UPDATE board SET commentCount = commentCount - 1 WHERE boardId = #{boardId} AND commentCount > 0
+    </update>
+
+    <select id="searchCommonBoard" resultType="com.hankki.pickmeal.domain.Board">
+        SELECT b.*, u.nickname,
+        (SELECT COUNT(*) FROM comment c WHERE c.boardId = b.boardId) as commentCount
+        FROM board b
+        JOIN user u ON b.user_id = u.user_id
+        WHERE b.is_notice = 'N'
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="searchType == 'title_content'">
+                    AND (b.title LIKE CONCAT('%', #{keyword}, '%') OR b.content LIKE CONCAT('%', #{keyword}, '%'))
+                </when>
+                <when test="searchType == 'title'">
+                    AND b.title LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="searchType == 'content'">
+                    AND b.content LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+                <when test="searchType == 'nickname'">
+                    AND u.nickname LIKE CONCAT('%', #{keyword}, '%')
+                </when>
+            </choose>
+        </if>
+        ORDER BY b.boardId DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countSearchBoard" resultType="long">
+        SELECT COUNT(*) FROM board
+        WHERE is_notice = 'N'
+        <if test="keyword != null and keyword != ''">
+            <choose>
+                <when test="searchType == 'title_content'">
+                    AND (title LIKE CONCAT('%', #{keyword}, '%') OR content LIKE CONCAT('%', #{keyword}, '%'))
+                </when>
+            </choose>
+        </if>
+    </select>
+</mapper>

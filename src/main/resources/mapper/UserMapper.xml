@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hankki.pickmeal.mapper.UserMapper">
+    <resultMap id="UserResultMap" type="com.hankki.pickmeal.domain.User">
+        <id property="user_id" column="user_id" />
+        <result property="id" column="id" />
+        <result property="password" column="password" />
+        <result property="nickname" column="nickname" />
+        <result property="name" column="name" />
+        <result property="email" column="email" />
+        <result property="birthDate" column="birthDate" />
+        <result property="gender" column="gender" />
+        <result property="phoneNumber" column="phoneNumber" />
+        <result property="likeMenu" column="likeMenu" />
+        <result property="disLikeMenu" column="disLikeMenu" />
+        <result property="joinDate" column="joinDate" />
+        <result property="role" column="role" />
+        <result property="status" column="status" />
+        <result property="suspensionEndDate" column="suspension_end_date" />
+        <result property="socialLoginSite" column="socialLoginSite" />
+        <result property="socialId" column="socialId" />
+    </resultMap>
+    <insert id="insertUser" parameterType="com.hankki.pickmeal.domain.User">
+        INSERT INTO user (
+        id, password, nickname, name, email, birthDate, gender,
+        phoneNumber, likeMenu, disLikeMenu, role, status,
+        socialLoginSite, socialId
+        ) VALUES (
+        #{id}, #{password}, #{nickname}, #{name}, #{email}, #{birthDate}, #{gender},
+        #{phoneNumber}, #{likeMenu}, #{disLikeMenu}, #{role}, #{status},
+        #{socialLoginSite}, #{socialId}
+        )
+    </insert>
+    <insert id="save" parameterType="com.hankki.pickmeal.domain.User">
+        INSERT INTO user (
+        id, password, nickname, name, email, birthDate, gender,
+        phoneNumber, likeMenu, disLikeMenu, role, status,
+        socialLoginSite, socialId
+        ) VALUES (
+        #{id}, #{password}, #{nickname}, #{name}, #{email}, #{birthDate}, #{gender},
+        #{phoneNumber}, #{likeMenu}, #{disLikeMenu}, #{role}, #{status},
+        #{socialLoginSite}, #{socialId}
+        )
+    </insert>
+
+    <select id="findById" resultMap="UserResultMap">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+
+    <select id="findByEmail" resultType="com.hankki.pickmeal.domain.User">
+        SELECT * FROM user WHERE email = #{email} AND status != 'WITHDRAWN'
+    </select>
+
+    <select id="countByNickname" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM user
+        WHERE UPPER(TRIM(nickname)) = UPPER(TRIM(#{nickname}))
+    </select>
+
+    <update id="updateEmail">
+        UPDATE user SET email = #{email} WHERE user_id = #{user_id}
+    </update>
+
+    <update id="edit" parameterType="com.hankki.pickmeal.domain.User">
+        UPDATE user
+        SET
+        nickname = #{nickname},
+        phoneNumber = #{phoneNumber},
+        likeMenu = #{likeMenu},
+        disLikeMenu = #{disLikeMenu}
+        WHERE user_id = #{user_id}
+    </update>
+
+    <select id="getMixedFoods" resultType="com.hankki.pickmeal.domain.Food">
+        SELECT * FROM food
+        WHERE category IN
+        <foreach item="type" collection="types" open="(" separator="," close=")">
+            #{type}
+        </foreach>
+        ORDER BY RAND()
+        LIMIT #{round}
+    </select>
+
+    <select id="getTop10Foods" resultType="com.hankki.pickmeal.domain.Food">
+        SELECT * FROM food
+        ORDER BY winCount DESC
+        LIMIT 10
+    </select>
+
+    <update id="updateWinCount">
+        /* [비유] food 테이블에서 foodId가 일치하는 음식을 찾아 winCount를 1 올립니다. */
+        UPDATE food
+        SET winCount = winCount + 1
+        WHERE foodId = #{foodId}
+    </update>
+
+    <select id="findByUser_id" resultType="com.hankki.pickmeal.domain.User">
+        SELECT * FROM user
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="findUserByNameAndEmail" resultType="com.hankki.pickmeal.domain.User">
+        SELECT * FROM user
+        WHERE name = #{name} AND email = #{email} AND status = 'ACTIVE'
+    </select>
+
+    <select id="findUserByIdAndEmail" resultMap="UserResultMap">
+        SELECT
+        user_id,
+        id,
+        email,
+        status
+        FROM user
+        WHERE id = #{id}
+        AND email = #{email}
+        AND status = 'ACTIVE'
+    </select>
+
+    <update id="updatePassword">
+        UPDATE user
+        SET password = #{newPassword}
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="getLikedMenuString" resultType="String">
+        SELECT likeMenu FROM user WHERE user_id = #{userId}
+    </select>
+
+    <select id="getDislikedMenuString" resultType="String">
+        SELECT disLikeMenu FROM user WHERE user_id = #{userId}
+    </select>
+    <update id="updateWithdrawal" parameterType="com.hankki.pickmeal.domain.User">
+        UPDATE user
+        SET status = 'WITHDRAWN',
+        id = #{id},
+        email = #{email},
+        nickname = #{nickname}
+        WHERE user_id = #{user_id}
+    </update>
+    <update id="updateUserSuspension" parameterType="com.hankki.pickmeal.domain.User">
+        UPDATE user
+        SET status = #{status},
+        suspension_end_date = #{suspensionEndDate}
+        WHERE user_id = #{user_id}
+    </update>
+    <update id="releaseExpiredSuspensions">
+        <![CDATA[
+        UPDATE user
+        SET status = 'ACTIVE',
+            suspension_end_date = NULL
+        WHERE status = 'SUSPENDED'
+          AND suspension_end_date <= NOW()
+        ]]>
+    </update>
+    <select id="searchUsersByNickname" resultMap="UserResultMap">
+        SELECT * FROM user WHERE nickname LIKE CONCAT('%', #{nickname}, '%')
+    </select>
+</mapper>

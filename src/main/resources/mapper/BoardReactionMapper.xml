@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hankki.pickmeal.mapper.BoardReactionMapper">
+    <insert id="boardLikeOrDislikeReaction" parameterType="com.hankki.pickmeal.domain.BoardReaction">
+        INSERT INTO board_reaction(user_id, boardId, like_type)
+        VALUES(#{user_id}, #{boardId}, #{like_type})
+    </insert>
+    <select id="isLikeOrDislike" parameterType="com.hankki.pickmeal.domain.BoardReaction" resultType="int">
+        SELECT like_type
+        FROM board_reaction
+        WHERE boardId = #{boardId} AND user_id = #{user_id}
+    </select>
+    <delete id="removeLikeOrDislikeReaction" parameterType="com.hankki.pickmeal.domain.BoardReaction">
+            DELETE FROM board_reaction
+            WHERE boardId = #{boardId} AND user_id = #{user_id}
+    </delete>
+</mapper>

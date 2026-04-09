@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hankki.pickmeal.mapper.TokenMapper">
+
+    <resultMap id="TokenResultMap" type="com.hankki.pickmeal.domain.PasswordResetToken">
+        <id property="tokenId" column="token_id" />
+        <result property="userId" column="user_id" />
+        <result property="token" column="token" />
+        <result property="expiryDate" column="expiry_date" />
+    </resultMap>
+
+    <insert id="saveToken" parameterType="com.hankki.pickmeal.domain.PasswordResetToken">
+        INSERT INTO password_reset_token (user_id, token, expiry_date)
+        VALUES (#{userId}, #{token}, #{expiryDate})
+    </insert>
+
+    <select id="findByToken" resultMap="TokenResultMap">
+        SELECT token_id, user_id, token, expiry_date
+        FROM password_reset_token
+        WHERE token = #{token}
+    </select>
+
+    <delete id="deleteToken">
+        DELETE FROM password_reset_token WHERE token = #{token}
+    </delete>
+
+</mapper>
