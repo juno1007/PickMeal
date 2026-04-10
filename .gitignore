@@ -31,27 +31,20 @@ build/
 
 ### VS Code ###
 .vscode/
-/class/
-/.idea/
-/out/
-/build/
-/target/
-*.class
 ../class/
-class/
-**/target/
-**/build/
-**/out/
-.idea/
-**/class/
 
-# application.properties 제외 설정
-src/main/resources/application.properties
-
-# Secret files
+### Sensitive / Secret files ###
 application-secret.properties
-src/main/resources/application-secret.properties
+application-local.properties
+*-secret.properties
+*.env
+.env
+.env.*
 
-# Build artifacts
-build/libs/*.jar
+### Build artifacts ###
 *.jar
+*.war
+
+### OS ###
+.DS_Store
+Thumbs.db

@@ -1,1 +1,1 @@
-web: java -jar build/libs/pickmeal-0.0.1-SNAPSHOT.jar
+web: java -Dspring.profiles.active=prod -jar target/PickMeal-0.0.1-SNAPSHOT.jar
