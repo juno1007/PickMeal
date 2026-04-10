@@ -41,9 +41,9 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          region: ${{ secrets.AWS_REGION }}
-          application_name: ${{ secrets.EB_APP_NAME }}
-          environment_name: ${{ secrets.EB_ENV_NAME }}
+          region: ap-northeast-2
+          application_name: pickmeal
+          environment_name: pickmeal-prod
           version_label: pickmeal-${{ github.sha }}
           deployment_package: deploy.zip
           wait_for_environment_recovery: 120
