@@ -36,4 +36,4 @@ jobs:
           version_label: ${{ github.sha }}
           region: ap-northeast-2
           # 3. 빌드된 결과물(jar)은 target 폴더 안에 생깁니다.
-          deployment_package: target/pickmeal-0.0.1-SNAPSHOT.jar
+          deployment_package: target/PickMeal-0.0.1-SNAPSHOT.jar
