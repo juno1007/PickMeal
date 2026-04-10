@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="1e8719c0-9992-4814-868d-92e2b0a41396" name="변경" comment="26.03.05 1738 재민 코드 병합">
       <change beforePath="$PROJECT_DIR$/.github/workflows/deploy.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/deploy.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,12 +21,12 @@
     &quot;assignee&quot;: &quot;woals10006-commits&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/dlive838-maker/PickMeal.git&quot;,
-    &quot;accountId&quot;: &quot;453e9330-37b0-4881-b769-ab3dfe353017&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/juno1007/PickMeal.git",
+    "accountId": "453e9330-37b0-4881-b769-ab3dfe353017"
   }
-}</component>
+}]]></component>
   <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
   <component name="KubernetesApiProvider"><![CDATA[{
   "isMigrated": true
@@ -80,7 +79,7 @@
       <updated>1772763751055</updated>
       <workItem from="1775729116987" duration="65000" />
       <workItem from="1775729659590" duration="26000" />
-      <workItem from="1775778919395" duration="5371000" />
+      <workItem from="1775778919395" duration="5684000" />
     </task>
     <servers />
   </component>
