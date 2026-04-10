@@ -5,14 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1e8719c0-9992-4814-868d-92e2b0a41396" name="변경" comment="26.03.05 1738 재민 코드 병합">
-      <change afterPath="$PROJECT_DIR$/.ebextensions/01-options.config" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.github/workflows/deploy.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.platform/nginx/conf.d/proxy.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Procfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/application-prod.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/PickMeal/pickmeal/PasswordTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/hankki/pickmeal/PasswordTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,6 +27,10 @@
     &quot;accountId&quot;: &quot;453e9330-37b0-4881-b769-ab3dfe353017&quot;
   }
 }</component>
+  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 0
@@ -82,7 +79,7 @@
       <updated>1772763751055</updated>
       <workItem from="1775729116987" duration="65000" />
       <workItem from="1775729659590" duration="26000" />
-      <workItem from="1775778919395" duration="1763000" />
+      <workItem from="1775778919395" duration="3214000" />
     </task>
     <servers />
   </component>
